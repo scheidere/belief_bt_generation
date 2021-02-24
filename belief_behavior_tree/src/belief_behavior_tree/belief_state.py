@@ -42,6 +42,55 @@ class BeliefState:
 
             self.belief.append(subset)
 
+    def __eq__(self, other_belief_state):
+
+        # Need to access state variable in state object 
+        # Can't just compare instances 
+
+        #print(self.belief)
+        #print(other_belief_state.belief)
+
+        #for tup in other_belief_state.belief:
+        #    print(tup[0])
+
+
+        # First confirm the other_state input is an instance of state class
+        if not isinstance(other_belief_state, BeliefState):
+            # Don't compared against unrelated types
+            return NotImplemented
+
+        # If they are different lengths, different num states, they are different
+        if len(self.belief) != len(other_belief_state.belief):
+            return False # Not same
+
+        else:
+
+            for i in range(len(self.belief)):
+                state_in_self = self.belief[i][1] 
+                prob_in_self = self.belief[i][0]
+
+                # Assume current state/prob not in other belief state
+                found_in_other = False
+
+                for j in range(len(other_belief_state.belief)):
+                    state_in_other = other_belief_state.belief[j][1] 
+                    prob_in_other = other_belief_state.belief[j][0]
+
+                    # Check if state is there
+                    if state_in_self.__eq__(state_in_other) and prob_in_self == prob_in_other:
+                        if self.DEBUG:
+                            print(prob_in_self, state_in_self.state)
+                            print(prob_in_other, state_in_other.state)
+                        found_in_other = True
+
+                if not found_in_other: # belief states are different
+                    return False
+
+        
+        # If made it through loops, all state/prob pairs are in both
+        return True
+
+
     def check_preconditions(self, preconditions):
 
         # Input will be a list of lists, each list contains a precondition string and 'S', 'F', or 'R'
@@ -138,18 +187,23 @@ class BeliefState:
 
         # Input is a belief state list (same type as self.belief)
         # Search for states that are the same
-        '''
-        not done 
+        # Combine by adding probs
 
-        no_duplicates_belief = copy.deepcopy()
+        no_duplicates_belief = []
         
         for state_info_tuple_1 in new_belief:
+            state1 = state_info_tuple_1[1]
             for state_info_tuple_2 in new_belief:
-                
+                state2 = state_info_tuple_2[1]
+                if state1.__eq__(state2): # do we care about return status?
+                    new_prob = state_info_tuple_1[0] + state_info_tuple_2[0]
 
-        return new_belief
-        '''
-        pass
+                    no_duplicates_belief.append((new_prob,state1,state_info_tuple_1[2]))
+
+        could there be more than two instances ???
+                
+        return no_duplicates_belief
+        
 
     def apply_action_belief_state(self, action):
 
@@ -283,6 +337,10 @@ def combine (mem_1, mem_2, table_yaml, DEBUG = False):
 
     '''
 
+    # Check if they are already the same
+    if mem1.__eq__(mem2):
+        return mem1
+
     new_mem = BeliefState([],[], table_yaml)
 
     if DEBUG:
@@ -307,7 +365,7 @@ def combine (mem_1, mem_2, table_yaml, DEBUG = False):
                 print('state_2', state_2)
 
             # Check that states are the same, including return status
-            if state_1 == state_2:
+            if state_1.__eq__(state_2): #??? need to make and use __eq__ function cuz cant compare objects, need class variables
 
                 if DEBUG:
                     print("duplicate found", state_1, state_2)

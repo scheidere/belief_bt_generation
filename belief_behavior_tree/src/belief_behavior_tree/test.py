@@ -114,7 +114,43 @@ def combine_belief_states_test(table_yaml):
 
     combine(mem_1, mem_2, table_yaml)
 
-def belief_state_equiv_test()
+def state_equiv_test(init_state, table_yaml):
+
+    print("##### Running state_equiv_test #####")
+
+    # Testing state-state and belief_state-belief_state equivalence using new __eq__ funcs
+
+    print("Testing state equivalence")
+    # Make some different state instances
+    state1 = State(table_yaml)
+    state2 = State(table_yaml)
+    state1.updateState(['occluded','social_interaction'],['F','S'])
+    state2.updateState(['occluded','social_interaction'],['S','S'])
+
+    print("Checking different states...")
+    # Test they are different, meaning it should return false
+    print("State1: ", state1.state)
+    print("State2: ", state2.state)
+    print(state1.__eq__(state2))
+
+    print("Checking identical states...")
+    # Test they are same
+    state3 = State(table_yaml)
+    state3.updateState(['occluded','social_interaction'],['F','S'])
+    print("State1: ", state1.state)
+    print("State3: ", state3.state)
+    print(state1.__eq__(state3))
+
+    # Test belief state stuff
+    print("Testing belief state equivalence...")
+    probs1 = [0.5,0.5]
+    states1 = [state1,state2]
+    probs2 = [0.5,0.5] #[0.5,0.9]
+    states2 = [state1,state2] #[state1,state3]
+    belief_state1 = BeliefState(states1,probs1, table_yaml)
+    belief_state2 = BeliefState(states2,probs2, table_yaml)
+
+    print(belief_state1.__eq__(belief_state2))
 
 if __name__ == "__main__":
 
@@ -139,3 +175,5 @@ if __name__ == "__main__":
 
 
     #combine_belief_states_test(table_yaml)
+
+    state_equiv_test(init_state, table_yaml)

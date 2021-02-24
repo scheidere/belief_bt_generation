@@ -38,6 +38,18 @@ class State:
                 print(status_list[i])
             self.state[condition_string_list[i]] = status_list[i]
 
+    def __eq__(self, other_state):
+
+        # Need to access state variable in state object 
+        # Can't just compare instances 
+
+        # First confirm the other_state input is an instance of state class
+        if not isinstance(other_state, State):
+            # Don't compared against unrelated types
+            return NotImplemented
+
+        return self.state == other_state.state
+
 
 
 #??? make state generation take a bt, pull nodes, differentiate between those of same type
