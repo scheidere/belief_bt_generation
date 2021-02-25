@@ -29,7 +29,8 @@ def self_simulate(behavior_tree, mem, max_ticks, max_states): #assuming input bt
 
     	# Split the belief state, mem, based on which actions have completed in each state (ended), 
     	# and which have been delayed because concurrent actions aren't allowed (those states retained in mem)
-    	ended, mem = current_mem.split_by_delayed_actions(behavior_tree.active_actions)
+    	#ended, mem = current_mem.split_by_delayed_actions(behavior_tree.active_actions)
+    	ended, mem = current_mem.split_by_delayed_actions()
 
     	# Update results with states that have no delayed actions, i.e. only actions that have ended
     	results = combine(results, ended)

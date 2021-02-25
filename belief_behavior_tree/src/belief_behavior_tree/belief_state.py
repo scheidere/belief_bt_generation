@@ -291,32 +291,71 @@ class BeliefState:
 
     
 
-    def split_by_delayed_actions(self, active_bt_actions): # need return statuses included?
-        # Given belief state, whole or subset
-        # Depending on status returned, updated belief state, i.e. mem
-        return mem_given_return_status # maybe return is more complex
+    #def split_by_delayed_actions(self, active_bt_actions): # need return statuses included?
+    def split_by_delayed_actions(self)
+        # Given belief state (self)
+        # Return two belief states, the part with running status in each tuple, and the rest
+
+        # need to split by which actions are running and which are S/F -> 
+        # only need to know status of root node (it will return running if any action running)
+
+
+        # # Init subset of the belief state with a "running" status
+        # mem = copy.deepcopy(self)
+
+        # # Init subset of the belief state with other statuses
+        # ended = copy.deepcopy(self)
+        # ended.belief = []
+
+
+        # for i in range(len(self.belief)):
+        #     status = self.belief[i][2]
+        #     if status != 'R':
+        #         # Remove tuple from mem (because it doesn't have running status)
+        #         status_not_running_tuple = mem.belief.pop(i)
+
+        #         # Add to ended because it isn't running (lol)
+        #         ended.belief.append(status_not_running_tuple)
+
+
+        # return ended, mem 
+
+        mem, ended = self.split_by_return_status(return_status = 'R')
+        return ended, mem
 
         
-        do we need action info???
-
-        need to split by which actions are running and which are S/F -> only need to know status of root node (it will return running if any action running)
-
-        "return result.action_key not in s or len(s[result.action_key]) == 0" ??? #see planningbehaviortree.py/bs_interface.py from their code
-    '''
+    
     def split_by_return_status(self, return_status = None):
         # Given belief state, whole or subset
         # Depending on status returned, updated belief state, i.e. mem
-        return mem_given_return_status # maybe return is more complex
 
-        Example: return status = ReturnStatus.SUCCESS
+        # Expect return_status to be a string, e,g. 'R', 'S', or 'F'
+        
+        # Init subset of the belief state with the goal status
+        belief_state_goal = copy.deepcopy(self)
 
-        Find all physical states in belief state which have ReturnStatus.SUCCESS for given node
-
-        Determine for that node in each state, what its status is after checking condition statuses in State, given current_bt
-
-        do we need action info???
+        # Init subset of the belief state with other statuses
+        belief_state = copy.deepcopy(self)
+        belief_state.belief = []
 
 
+        for i in range(len(self.belief)):
+            status = self.belief[i][2]
+            if status != return_status:
+                # Remove tuple from belief_state_goal (because it doesn't have goal status)
+                non_goal_status_tuple = belief_state_goal.belief.pop(i)
+
+                # Add to ended because it isn't running (lol)
+                belief_state.belief.append(non_goal_status_tuple)
+
+
+        return belief_state_goal, belief_state
+
+      
+
+
+
+    '''
     def apply_delayed_actions(self):
 
         # Initialize empty resulting belief state

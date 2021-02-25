@@ -55,7 +55,8 @@ def refine_tree(behavior_tree, goal_prob, current_belief_state):
 
 		# Differentiate between the states where the goal has been reached, and all others
 		# Update current belief_state with remaining states
-		belief_state_goal, belief_state = belief_state.split_by_return_status(behavior_tree, return_status = ReturnStatus.SUCCESS)
+		#belief_state_goal, belief_state = belief_state.split_by_return_status(behavior_tree, return_status = ReturnStatus.SUCCESS)
+		belief_state_goal, belief_state = belief_state.split_by_return_status(return_status = ReturnStatus.SUCCESS)
 
 		# Calculate the probability that the actual physical goal state has been reached via belief state
 		prob_in_goal_state = belief_state_goal.probability_goal_reached()
