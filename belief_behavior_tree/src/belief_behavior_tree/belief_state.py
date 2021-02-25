@@ -185,24 +185,46 @@ class BeliefState:
 
     def combine_duplicates(self, new_belief):
 
-        # Input is a belief state list (same type as self.belief)
-        # Search for states that are the same
+        # Input is a belief state list (like self.belief)
+        # Search for states that are the same, without double counting
         # Combine by adding probs
 
         no_duplicates_belief = []
+
+        # Ensure you only combine each set of duplicates once using this tracker
+        already_combined = []
         
         for state_info_tuple_1 in new_belief:
-            state1 = state_info_tuple_1[1]
+
+            # Look for duplicates for state that hasn't already ready been considered for combination
+            if state_info_tuple_1[1].state not in already_combined:
+                state1 = state_info_tuple_1[1]
+                status1 = state_info_tuple_1[2]
+
+                prob = state_info_tuple_1[0]
+            else:
+                continue
+
+            # Search rest of belief state for duplicate states
             for state_info_tuple_2 in new_belief:
                 state2 = state_info_tuple_2[1]
-                if state1.__eq__(state2): # do we care about return status?
-                    new_prob = state_info_tuple_1[0] + state_info_tuple_2[0]
+                status2 = state_info_tuple_2[2]
 
-                    no_duplicates_belief.append((new_prob,state1,state_info_tuple_1[2]))
+                # Find every duplicate (same state but NOT same instance)
+                if state1 != state2 and state1.__eq__(state2) and status1 == status2: # do we care about return status?
 
-        could there be more than two instances ???
+                    # Sum probability given probability for each duplicate
+                    prob += state_info_tuple_2[0]
+
+            # Add combined info for state1, which may just be the original info if no duplicates found
+            no_duplicates_belief.append((prob,state1,status1))
+            already_combined.append(state1.state)
                 
         return no_duplicates_belief
+
+    def normalize(self):
+        pass
+        # probably need this for combine()
         
 
     def apply_action_belief_state(self, action):
@@ -255,8 +277,7 @@ class BeliefState:
                 if self.DEBUG:
                     print('NEW STATE',new_state.state)
         # Update actual belief state, combining probs if same state was added twice via postcondition updates
-        #self.belief = self.combine_duplicates(new_belief) ???
-        self.belief = new_belief
+        self.belief = self.combine_duplicates(new_belief)
 
         return self
 
@@ -268,7 +289,7 @@ class BeliefState:
 
             string = postconditions[1]
 
-    '''
+    
 
     def split_by_delayed_actions(self, active_bt_actions): # need return statuses included?
         # Given belief state, whole or subset
@@ -281,7 +302,7 @@ class BeliefState:
         need to split by which actions are running and which are S/F -> only need to know status of root node (it will return running if any action running)
 
         "return result.action_key not in s or len(s[result.action_key]) == 0" ??? #see planningbehaviortree.py/bs_interface.py from their code
-
+    '''
     def split_by_return_status(self, return_status = None):
         # Given belief state, whole or subset
         # Depending on status returned, updated belief state, i.e. mem
@@ -335,11 +356,15 @@ def combine (mem_1, mem_2, table_yaml, DEBUG = False):
 
     Revist to optimize: compare slices instead of reassigning, etc
 
+    QUESTIONS:
+
+    DO WE NEED TO DEAL WITH NORMALIZATION? Like when a split mem gets added to results in self_simulate
+
     '''
 
     # Check if they are already the same
-    if mem1.__eq__(mem2):
-        return mem1
+    if mem_1.__eq__(mem_2):
+        return mem_1
 
     new_mem = BeliefState([],[], table_yaml)
 
@@ -352,7 +377,8 @@ def combine (mem_1, mem_2, table_yaml, DEBUG = False):
 
         is_duplicate = False
 
-        state_1 = state_info_tuple_1[1:] #includes root return status, should be same for identical states
+        state_1 = state_info_tuple_1[1]
+        status_1 = state_info_tuple_1[2]
 
         if DEBUG:
             print('state_1', state_1)
@@ -360,12 +386,13 @@ def combine (mem_1, mem_2, table_yaml, DEBUG = False):
         for state_info_tuple_2 in mem_2.belief:
 
             state_2 = state_info_tuple_2[1:] #includes root return status, should be same for identical states
+            status_2 = state_info_tuple_2[2]
 
             if DEBUG:
                 print('state_2', state_2)
 
             # Check that states are the same, including return status
-            if state_1.__eq__(state_2): #??? need to make and use __eq__ function cuz cant compare objects, need class variables
+            if state_1.__eq__(state_2) and status_1 == status_2: 
 
                 if DEBUG:
                     print("duplicate found", state_1, state_2)

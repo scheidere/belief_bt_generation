@@ -420,30 +420,10 @@ class Action(ExecutionNode):
 
     def tick_mem(self, mem):
 
-        # Notes
+        # QUESTION:
         # Does a ticked action with preconditions that hold return running or success on its first tick? is this the delayed action concept???
 
-        ####
-
-        yaml info in mem.table_yaml
-
-        ??? # update tick function using info from tables to expand belief state, also track return statuses for each tuple in belief state
-
-        # Walk through states in belief state
-
-            # Apply action given each state
-
-                # Look for action preconditions (which are pulled from actions.yaml)
-
-                # States where one or more precondition fails will give a return status of failure for the action by default
-
-                # States where all preconditions are satisfied will depend on the probability distribution and postconditions
-
-            # Expand belief state if action application created the possibility of the robot being in a state not yet listed in the belief state
-
-            # Update each expanded state's return status to match the action return status
-
-            # If the action could result in a state already in the belief state, just update that state's return status
+        return mem.apply_action_belief_state(self.label)
 
 
 

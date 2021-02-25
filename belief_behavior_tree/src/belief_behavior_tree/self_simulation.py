@@ -33,6 +33,7 @@ def self_simulate(behavior_tree, mem, max_ticks, max_states): #assuming input bt
 
     	# Update results with states that have no delayed actions, i.e. only actions that have ended
     	results = combine(results, ended)
+    	print("Results (do they need to be normalized?): ", results.belief)
 
     	# Now deal with the actions that could not be completed in previous tick, i.e. the delayed actions
     	mem = mem.apply_delayed_actions() ??? not sure how this works yet

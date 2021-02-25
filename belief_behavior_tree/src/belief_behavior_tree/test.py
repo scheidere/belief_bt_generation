@@ -152,6 +152,28 @@ def state_equiv_test(init_state, table_yaml):
 
     print(belief_state1.__eq__(belief_state2))
 
+def combine_duplicates_test(belief_state, table_yaml):
+
+    # Define list with duplicates to test
+    state1 = State(table_yaml)
+    state1.updateState(['occluded','social_interaction'],['F','S'])
+    state2 = State(table_yaml)
+    state2.updateState(['occluded','social_interaction'],['S','S'])
+    state3 = State(table_yaml)
+    state3.updateState(['occluded','social_interaction'],['F','S'])
+    state4 = State(table_yaml)
+    state4.updateState(['occluded','social_interaction'],['S','S'])
+
+    # States 1 and 3 should be combined, states 2 and 4 also
+    belief_list1 = [(0.1,state1,'S'),(0.3,state2,'S'),(0.3, state3,'S'),(0.3,state4,'S')]
+    belief_list2 = [(0.5,state1,'S'),(0.5,state2,'S')]
+
+    print('belief_list1, ',belief_list1)
+    print('after1', belief_state.combine_duplicates(belief_list1))
+    print('belief_list2, ',belief_list2)
+    print('after2',belief_state.combine_duplicates(belief_list2))
+
+
 if __name__ == "__main__":
 
     # Want prints, make True!
@@ -173,7 +195,8 @@ if __name__ == "__main__":
     after_action_belief_state = init_belief_state.apply_action_belief_state('move_toward')
     print('after', after_action_belief_state.belief)
 
-
-    #combine_belief_states_test(table_yaml)
+    combine_belief_states_test(table_yaml)
 
     state_equiv_test(init_state, table_yaml)
+
+    combine_duplicates_test(init_belief_state, table_yaml)
