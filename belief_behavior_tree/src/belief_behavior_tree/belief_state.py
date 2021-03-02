@@ -21,6 +21,17 @@ class BeliefState:
         self.table_yaml = table_yaml
         self.action_table_list = self.table_yaml['action_table']
         #print(self.action_table_list)
+        self.condition_table_list = self.table_yaml['condition_table']
+        self.goal_conditions_list = self.table_yaml['goal_condition_table']
+        self.goal_conditions = [] # List of strings, e.g. 'child_moving_toward'
+        self.goal_condition_statuses = [] # List of strings, e.g. 'S'
+        for condition_index in range(len(self.goal_conditions_list)):
+
+            goal_condition_info_dictionary = self.goal_conditions_list[condition_index]
+            goal_condition_string = goal_condition_info_dictionary['condition']
+            goal_status_string = goal_condition_info_dictionary['status']
+            self.goal_conditions.append(goal_condition_string)
+            self.goal_condition_statuses.append(goal_status_string)
 
         self.DEBUG = DEBUG
 
@@ -281,6 +292,8 @@ class BeliefState:
 
         return self
 
+
+    '''
     def get_condition_groups(self, postconditions):
 
         temp_postconds = copy.deepcopy(postconditions)
@@ -288,11 +301,11 @@ class BeliefState:
         for postcondition in postconditions:
 
             string = postconditions[1]
-
+    '''
     
 
     #def split_by_delayed_actions(self, active_bt_actions): # need return statuses included?
-    def split_by_delayed_actions(self)
+    def split_by_delayed_actions(self):
         # Given belief state (self)
         # Return two belief states, the part with running status in each tuple, and the rest
 
@@ -325,7 +338,7 @@ class BeliefState:
 
         
     
-    def split_by_return_status(self, return_status = None):
+    def split_by_return_status(self, return_status = None, check_goal_condition = False):
         # Given belief state, whole or subset
         # Depending on status returned, updated belief state, i.e. mem
 
@@ -340,7 +353,10 @@ class BeliefState:
 
 
         for i in range(len(self.belief)):
-            status = self.belief[i][2]
+            if check_goal_condition:
+                status = self.get_goal_conditions_status(self.belief[i][1], goal_conditions_list)
+            else:
+                status = self.belief[i][2]
             if status != return_status:
                 # Remove tuple from belief_state_goal (because it doesn't have goal status)
                 non_goal_status_tuple = belief_state_goal.belief.pop(i)
@@ -351,10 +367,37 @@ class BeliefState:
 
         return belief_state_goal, belief_state
 
+
+    def get_goal_conditions_status(self, state, goal_conditions_list):
+
+        # Input: a single state from a belief state
+
+        # Output: 'S' if both goal conditions are at goal statuses, 'R' if any unknown, 'F' if any wrong
+
+        # Note: these returned statuses are kind of pseudo-statuses, the individual goal conditions might have statuses of 'S' 'F' or 'R'
+        # even if another is returned to communicate whether it is known that the goal has ('S') or hasnt been reached ('F') or if it is unknown ('R')
+
+        at_goal = True
+
+        state_dict = state.state
+
+        for i in range(len(self.goal_conditions)):
+
+            goal_condition_string = self.goal_conditions[i]
+            condition_status = state_dict[goal_condition_string]
+
+            if condition_status != self.goal_condition_statuses[i]:
+                at_goal = False
+
+                if condition_status == 'R':
+                    return condition_status
+                else:
+                    return 'F'
+        
+        if at_goal:
+
+                return 'S'
       
-
-
-
     '''
     def apply_delayed_actions(self):
 
@@ -378,10 +421,50 @@ class BeliefState:
 
         return resulting_mem
 
+    '''
+
+    def goal_reached(self, state):
+
+        for condition in state.state.keys():
+
+            for i in range(self.goal_conditions):
+                if condition == self.goal_conditions[i] and state.state[condition] == self.goal_condition_statuses[i]: 
+                    # If you are here: goal condition found with goal status
+                    break # condition was one of goal conditions, stop checking it, look at next condition in state
+
+                elif condition == self.goal_conditions[i] and not state.state[condition] == self.goal_condition_statuses[i]:
+                    # If you are here: goal condition found WITHOUT goal status
+                    # THIS IS BAD, i.e. this state has not reached the goal
+                    return False
+
+
+        # If you search the state, and all goal conditions are at goal status
+        return True
+
+
 
     def probability_goal_reached(self):
-        return single prob combining all state probs in belief state
-    '''
+
+        # Goal condition string list
+        print(self.goal_conditions)
+
+        # Corresponding goal status string list
+        print(self.goal_condition_statuses)
+
+        goal_reached_prob_sum = 0
+        count = 0
+
+        for state_info_tuple in self.belief:
+
+            # Check if goal reached
+            if self.goal_reached(state_info_tuple[1]):
+                goal_reached_prob_sum += state_info_tuple[0]
+                count += 1
+
+
+        # single prob combining all state probs in belief state in which the goal has been reached
+        return goal_reached_prob_sum/count 
+
 
 def combine (mem_1, mem_2, table_yaml, DEBUG = False):
 

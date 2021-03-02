@@ -37,7 +37,7 @@ def self_simulate(behavior_tree, mem, max_ticks, max_states): #assuming input bt
     	print("Results (do they need to be normalized?): ", results.belief)
 
     	# Now deal with the actions that could not be completed in previous tick, i.e. the delayed actions
-    	mem = mem.apply_delayed_actions() ??? not sure how this works yet
+    	###mem = mem.apply_delayed_actions() ??? not sure how this works yet
 
 
     # Once all delayed actions have been delt with, i.e. mem is empty, return results, i.e. expected belief state

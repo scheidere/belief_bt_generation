@@ -4,6 +4,7 @@ import yaml
 
 from world_simulator.state import State
 from belief_state import BeliefState, combine
+from behavior_tree.behavior_tree import BehaviorTree
 
 
 def general_state_test(table_yaml):
@@ -174,29 +175,41 @@ def combine_duplicates_test(belief_state, table_yaml):
     print('after2',belief_state.combine_duplicates(belief_list2))
 
 
+def behavior_tree_test():
+
+    bt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant.tree')
+    # try this with belief behavior tree too
+    print(bt)
+
+    bt.print_BT()
+
+
+
 if __name__ == "__main__":
 
     # Want prints, make True!
     DEBUG = False
 
-    # Get input table info; actions/conditions
-    table_yaml = get_table_yaml()
+    # # Get input table info; actions/conditions
+    # table_yaml = get_table_yaml()
 
-    init_state = general_state_test(table_yaml)
-    print("INIT STATE", init_state) # all statuses running
-    print(init_state.state)
+    # init_state = general_state_test(table_yaml)
+    # print("INIT STATE", init_state) # all statuses running
+    # print(init_state.state)
 
-    init_state.updateState(['occluded','social_interaction'],['F','S'])
-    print(init_state.state)
+    # init_state.updateState(['occluded','social_interaction'],['F','S'])
+    # print(init_state.state)
 
-    init_belief_state = general_belief_state_test(init_state, table_yaml)
-    print('before', init_belief_state.belief)
+    # init_belief_state = general_belief_state_test(init_state, table_yaml)
+    # print('before', init_belief_state.belief)
 
-    after_action_belief_state = init_belief_state.apply_action_belief_state('move_toward')
-    print('after', after_action_belief_state.belief)
+    # after_action_belief_state = init_belief_state.apply_action_belief_state('move_toward')
+    # print('after', after_action_belief_state.belief)
 
-    combine_belief_states_test(table_yaml)
+    # combine_belief_states_test(table_yaml)
 
-    state_equiv_test(init_state, table_yaml)
+    # state_equiv_test(init_state, table_yaml)
 
-    combine_duplicates_test(init_belief_state, table_yaml)
+    # combine_duplicates_test(init_belief_state, table_yaml)
+
+    behavior_tree_test()

@@ -62,3 +62,6 @@ if __name__ == '__main__':
 # update belief (with info from world not func within refine tree)
 # refine tree
 # loop
+
+
+??? write this based on pseudocode in interim paper
