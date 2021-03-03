@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 import yaml
-
+import copy
 from world_simulator.state import State
 from belief_state import BeliefState, combine
-from behavior_tree.behavior_tree import BehaviorTree
+from behavior_tree.behavior_tree import * #BehaviorTree, Sequence, ControlFlowNode
 
 
 def general_state_test(table_yaml):
@@ -177,13 +177,190 @@ def combine_duplicates_test(belief_state, table_yaml):
 
 def behavior_tree_test():
 
-    bt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant.tree')
+    #bt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/graeme.tree')
+    #bt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant.tree')
+    bt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
+
     # try this with belief behavior tree too
-    print(bt)
+    
+    print(bt.nodes)
 
     bt.print_BT()
 
+    for node in bt.nodes:
+        print(node.children)
 
+    condition_to_resolve = 'child_moving_toward'
+    parent = None
+
+    for node in bt.nodes:
+        if isinstance(node,ControlFlowNode):
+            print(node, True)
+
+            for child in node.children:
+                if child.label == condition_to_resolve:
+                    parent = node
+                    #todo
+
+        else:
+            print(node, False)
+
+    # Testing 
+    bt.nodes = [Sequence()] + bt.nodes
+    print(bt.nodes)
+    bt.root = bt.nodes[0]
+    bt.root.children = [bt.nodes[1]]
+
+    bt.write_config('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_test.tree')
+
+
+def children_dict(resolution_subtree_node_list):
+
+    children = {}
+
+    for i in range(len(new_node_list)):
+        node = new_node_list[i]
+
+        children[node] = []
+        for j in range(len(new_node_list)):
+            node2 = new_node_list[j]
+
+            if isinstance(node2,ControlFlowNode): # flawed, what if a child is a control flow node????
+                #finished adding children, at next 
+                break
+
+            elif node != node2:
+                children[node].append(node2)
+
+    pass
+
+
+
+def update_bt(bt, condition_to_resolve, resolution_subtree_node_list):
+
+    new_node_list = copy.deepcopy(bt.nodes)
+    print(new_node_list)
+    #new_bt = copy.deepcopy(bt) # this broke it!
+    new_bt = bt
+
+    # Check if at start, i.e. only one condition and no control nodes in tree
+    if len(new_node_list) == 1:
+        # Add root sequence
+        new_node_list = [Sequence()] + new_node_list
+
+    # not at start now, so find parent of condition, and add subtree to right of condition beneath parent 
+    new_node_list = new_node_list + resolution_subtree_node_list
+    new_bt.nodes = new_node_list
+    print(new_node_list)
+
+    children = {}
+
+
+    for i in range(len(new_node_list)):
+
+        node = new_node_list[i]
+
+        if i == 0:
+            new_bt.root = node
+
+        if isinstance(node,ControlFlowNode):
+
+            node.children = []
+            for child in children(node):
+                node.children.append(child)
+
+
+
+    return new_bt
+
+def update_bt_test():
+
+    bt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
+    condition_to_resolve = bt.nodes[0]
+    test_new_subtree = [Sequence(),Condition('direct_social_interaction'),Action('bubbles')]
+
+    new_bt = update_bt(bt, condition_to_resolve, test_new_subtree)
+    
+    for node in new_bt.nodes:
+        print(node)
+
+    print(new_bt.root)
+    print(new_bt.root.children)
+
+    new_bt.write_config('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_test.tree')
+
+
+def generate_resolution_subtree(condition_to_resolve_string, resolution_action_string):
+
+    # Input is string of condition we need to resolve, and string of action that can resolve it
+
+    root = Fallback()
+    condition_to_resolve = Condition(condition_to_resolve_string)
+    resolution_action = Action(resolution_action_string)
+
+    root.children.append(condition_to_resolve)
+    root.children.append(resolution_action)
+
+    print(root.children)
+
+    return root
+
+
+def find_resolution_action(condition_to_resolve_string, action_table_list):
+
+    resolution_action = None
+    resolution_prob = 0
+
+    for action_dict in action_table_list:
+
+        new_resolution_found = False
+
+        postconditions_list = action_dict['postconditions'] # [{0.5: [['child_moving_toward', 'S']]}, {0.5: [['child_moving_toward', 'F']]}]
+        for i in range(len(postconditions_list)):
+            print('i',i)
+            prob_postconditions_dict = postconditions_list[i] # {0.5: [['child_moving_toward', 'S']]}
+            print('prob_postconditions_dict', prob_postconditions_dict)
+            prob = prob_postconditions_dict.keys()[0] # 0.5
+            print('prob', prob)
+            prob_postconditions_list = prob_postconditions_dict[prob] # [['child_moving_toward', 'S']]
+            for postcondition_pair in prob_postconditions_list: # ['child_moving_toward', 'S']
+                if postcondition_pair[0] == condition_to_resolve_string and postcondition_pair[1] == 'S':
+                    # RESOLUTION FOUND (but is it the best?)
+                    if resolution_action == None:
+                        resolution_action = action_dict['action']
+                        print('resolution_action 1',resolution_action, prob)
+                        resolution_prob = prob
+                        new_resolution_found = True
+                        break
+                    elif prob > resolution_prob: #found better resolution
+                        resolution_action = action_dict['action']
+                        print('resolution_action after',resolution_action, prob)
+                        resolution_prob = prob
+                        new_resolution_found = True
+                        break
+
+            if new_resolution_found:
+                # go look at next action
+                break
+
+    # return resolution action with highest probability of success based on postcondition probs (if multiple tie, first one chosen)
+    return resolution_action
+
+
+def generate_resolution_subtree(condition_to_resolve_string, resolution_action_string):
+
+    # Input is string of condition we need to resolve, and string of action that can resolve it
+
+    root = Fallback()
+    condition_to_resolve = Condition(condition_to_resolve_string)
+    resolution_action = Action(resolution_action_string)
+
+    root.children.append(condition_to_resolve)
+    root.children.append(resolution_action)
+
+    print(root.children)
+
+    return root
 
 if __name__ == "__main__":
 
@@ -191,16 +368,18 @@ if __name__ == "__main__":
     DEBUG = False
 
     # # Get input table info; actions/conditions
-    # table_yaml = get_table_yaml()
+    table_yaml = get_table_yaml()
 
-    # init_state = general_state_test(table_yaml)
+    # yaml_test()
+
+    init_state = general_state_test(table_yaml)
     # print("INIT STATE", init_state) # all statuses running
     # print(init_state.state)
 
     # init_state.updateState(['occluded','social_interaction'],['F','S'])
     # print(init_state.state)
 
-    # init_belief_state = general_belief_state_test(init_state, table_yaml)
+    init_belief_state = general_belief_state_test(init_state, table_yaml)
     # print('before', init_belief_state.belief)
 
     # after_action_belief_state = init_belief_state.apply_action_belief_state('move_toward')
@@ -212,4 +391,14 @@ if __name__ == "__main__":
 
     # combine_duplicates_test(init_belief_state, table_yaml)
 
-    behavior_tree_test()
+    #behavior_tree_test() # general brainstorm testing
+
+    #update_bt_test() #unfinished
+
+    #generate_resolution_subtree()
+
+    #resolution_action = find_resolution_action('child_moving_toward',init_belief_state.action_table_list)
+    #print(resolution_action)
+
+    root = generate_resolution_subtree('child_moving_toward','bubbles')
+    print(root)

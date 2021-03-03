@@ -105,7 +105,7 @@ def find_failed_condition(behavior_tree, mem):
 			condition_string = node.label
 			status = state.state[condition_string]
 
-			if isInstance(node, Condition) and not evaluate(condition_string,status): #??? eval function incomplete
+			if isinstance(node, Condition) and not evaluate(condition_string,status): #??? eval function incomplete
 
 				# First time we find failing condition is inherently the deepest failing condition due to order of nodes list
 
@@ -154,9 +154,9 @@ def evaluate(condition_string, status):
 
 
 
-def resolve_by_insert(behavior_tree, belief_state, condition_to_resolve):
+def resolve_by_insert(behavior_tree, belief_state, condition_to_resolve_string):
 	#???
-	pass
+	##pass
 
 	# Get bt node list in form that tracks parent/children easily
 
@@ -165,7 +165,100 @@ def resolve_by_insert(behavior_tree, belief_state, condition_to_resolve):
 	# insert that action beneath a sequence to the right of the condition
 	# with preconditions to the left
 
-	return updated behavior tree (which is actually a bbt)
+	###return updated behavior tree (which is actually a bbt)
+
+	####check if parent is a root -> set tree.root = new parent
+
+
+	action_table_list = belief_state.action_table_list
+
+	resolution_action_string = find_resolution_action(condition_to_resolve_string, action_table_list)
+
+	resolution_subtree = generate_resolution_subtree(condition_to_resolve_string,resolution_action_string)
+
+	# Check if we are at start, i.e. only goal condition in tree, if so add sequence root
+	if isinstance(behavior_tree.root,Condition):
+		old_root = behavior_tree.root
+		behavior_tree.root = Sequence()
+		behavior_tree.root.children.append(old_root)
+
+	else:
+		behavior_tree.root = traverse_and_replace(behavior_tree.root, condition_to_resolve_string,resolution_subtree)
+
+	return behavior_tree
+
+def traverse_and_replace(root, condition_to_resolve_string, resolution_subtree):
+
+	not tested yet, double check logic ???
+
+	for i in range(len(root.children)):
+		node = root.children[i]
+		if isinstance(node,ControlFlowNode)
+		if node.label == condition_to_resolve_string:
+			root.children[i] = resolution_subtree
+			return root
+		else:
+			return traverse_and_replace(node,condition_to_resolve_string, resolution_subtree)
+
+
+def find_resolution_action(condition_to_resolve_string, action_table_list):
+
+    resolution_action = None
+    resolution_prob = 0
+
+    for action_dict in action_table_list:
+
+        new_resolution_found = False
+
+        postconditions_list = action_dict['postconditions'] # [{0.5: [['child_moving_toward', 'S']]}, {0.5: [['child_moving_toward', 'F']]}]
+        for i in range(len(postconditions_list)):
+            #print('i',i)
+            prob_postconditions_dict = postconditions_list[i] # {0.5: [['child_moving_toward', 'S']]}
+            #print('prob_postconditions_dict', prob_postconditions_dict)
+            prob = prob_postconditions_dict.keys()[0] # 0.5
+            #print('prob', prob)
+            prob_postconditions_list = prob_postconditions_dict[prob] # [['child_moving_toward', 'S']]
+            for postcondition_pair in prob_postconditions_list: # ['child_moving_toward', 'S']
+                if postcondition_pair[0] == condition_to_resolve_string and postcondition_pair[1] == 'S':
+                    # RESOLUTION FOUND (but is it the best?)
+                    if resolution_action == None:
+                        resolution_action = action_dict['action']
+                        #print('resolution_action 1',resolution_action, prob)
+                        resolution_prob = prob
+                        new_resolution_found = True
+                        break
+                    elif prob > resolution_prob: #found better resolution
+                        resolution_action = action_dict['action']
+                        #print('resolution_action after',resolution_action, prob)
+                        resolution_prob = prob
+                        new_resolution_found = True
+                        break
+
+            if new_resolution_found:
+                # go look at next action
+                break
+
+    # return resolution action with highest probability of success based on postcondition probs (if multiple tie, first one chosen)
+    return resolution_action
+
+
+def generate_resolution_subtree(condition_to_resolve_string, resolution_action_string):
+
+    # Input is string of condition we need to resolve, and string of action that can resolve it
+    # Output
+
+    root = Fallback()
+    condition_to_resolve = Condition(condition_to_resolve_string)
+    resolution_action = Action(resolution_action_string)
+
+    root.children.append(condition_to_resolve)
+    root.children.append(resolution_action)
+
+    print(root.children)
+
+    return root # subtree contained within root in parent/children storage
+
+
 
 
 
