@@ -742,10 +742,10 @@ class BeliefBehaviorTree:
             node_label = '=>'
         elif node_type == 'Fallback':
             node_label = '?'
-        '''
+        
         elif node_type == 'Parallel': 
             node_label = '|| ' + str( node.child_success_threshold )
-        '''
+        
         elif node_type == 'Condition':
             node_text = node.label
             node_label = '(' + node_text + ')'

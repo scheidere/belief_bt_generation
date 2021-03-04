@@ -5,6 +5,7 @@ import copy
 from world_simulator.state import State
 from belief_state import BeliefState, combine
 from behavior_tree.behavior_tree import * #BehaviorTree, Sequence, ControlFlowNode
+from refine_tree import *
 
 
 def general_state_test(table_yaml):
@@ -290,21 +291,8 @@ def update_bt_test():
     new_bt.write_config('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_test.tree')
 
 
-def generate_resolution_subtree(condition_to_resolve_string, resolution_action_string):
 
-    # Input is string of condition we need to resolve, and string of action that can resolve it
-
-    root = Fallback()
-    condition_to_resolve = Condition(condition_to_resolve_string)
-    resolution_action = Action(resolution_action_string)
-
-    root.children.append(condition_to_resolve)
-    root.children.append(resolution_action)
-
-    print(root.children)
-
-    return root
-
+'''
 
 def find_resolution_action(condition_to_resolve_string, action_table_list):
 
@@ -330,6 +318,10 @@ def find_resolution_action(condition_to_resolve_string, action_table_list):
                         resolution_action = action_dict['action']
                         print('resolution_action 1',resolution_action, prob)
                         resolution_prob = prob
+                        resolution_precondition_string_list = []
+                        resolution_preconditions_pair_list = action_dict['preconditions']
+                        for pair in resolution_preconditions_pair_list: # [direct_social_interaction, S]
+                            resolution_precondition_string_list.append(pair[0])
                         new_resolution_found = True
                         break
                     elif prob > resolution_prob: #found better resolution
@@ -344,24 +336,32 @@ def find_resolution_action(condition_to_resolve_string, action_table_list):
                 break
 
     # return resolution action with highest probability of success based on postcondition probs (if multiple tie, first one chosen)
-    return resolution_action
+    return resolution_action, resolution_precondition_string_list
 
 
-def generate_resolution_subtree(condition_to_resolve_string, resolution_action_string):
+def generate_resolution_subtree(condition_to_resolve_string, resolution_action_string, resolution_precondition_string_list):
 
     # Input is string of condition we need to resolve, and string of action that can resolve it
 
-    root = Fallback()
+    # Add children to root
+    root = Sequence()
     condition_to_resolve = Condition(condition_to_resolve_string)
-    resolution_action = Action(resolution_action_string)
-
     root.children.append(condition_to_resolve)
-    root.children.append(resolution_action)
+    root.children.append(Fallback())
+
+    # Add chilren to fallback
+    # First preconditions
+    for cond_string in resolution_precondition_string_list:
+        root.children[1].children.append(Condition(cond_string))
+    # Then action
+    resolution_action = Action(resolution_action_string)
+    root.children[1].children.append(resolution_action)
 
     print(root.children)
+    print(root.children[1].children)
 
     return root
-
+'''
 if __name__ == "__main__":
 
     # Want prints, make True!
@@ -397,8 +397,22 @@ if __name__ == "__main__":
 
     #generate_resolution_subtree()
 
-    #resolution_action = find_resolution_action('child_moving_toward',init_belief_state.action_table_list)
-    #print(resolution_action)
+    resolution_action, resolution_precondition_string_list = find_resolution_action('child_moving_toward',init_belief_state.action_table_list)
+    print(resolution_action)
+    print(resolution_precondition_string_list)
 
-    root = generate_resolution_subtree('child_moving_toward','bubbles')
-    print(root)
+    '''
+    bt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
+    resolution_subtree_root = generate_resolution_subtree('child_moving_toward','bubbles',['direct_social_interaction'])
+    print(resolution_subtree_root)
+    bt.root = resolution_subtree_root
+    bt.write_config('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_test.tree')
+    
+    
+    condition_to_resolve_string = 'child_moving_toward'
+    resolution_subtree = resolution_subtree_root
+    bt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
+    bt.root = traverse_and_replace(bt.root, condition_to_resolve_string, resolution_subtree)
+
+    bt.write_config('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_test.tree')
+    '''
