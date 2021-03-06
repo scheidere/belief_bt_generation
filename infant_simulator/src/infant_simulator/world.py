@@ -96,7 +96,7 @@ class World():
             self.robot_plot_arrow = plt.plot([self.robot_pos[0], robx+self.robot_pos[0]], [self.robot_pos[1], roby+self.robot_pos[1]])
             fig.canvas.draw()
             self.h_state = True
-            plt.savefig("images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+            plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
         else:
             self.image_counter += 1
             self.infant_plot[0].set_xdata(self.infant_pos[0])
@@ -108,7 +108,7 @@ class World():
 
             fig.canvas.draw()
             plt.pause(0.1)
-            plt.savefig("images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+            plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
 
     def bubbles(self):
         """

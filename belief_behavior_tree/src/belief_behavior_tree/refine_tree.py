@@ -264,7 +264,7 @@ def generate_resolution_subtree(condition_to_resolve_string, resolution_action_s
     # Input is string of condition we need to resolve, and string of action that can resolve it
 
     # Add children to root
-    root = Sequence()
+    root = Fallback()
     condition_to_resolve = Condition(condition_to_resolve_string)
     root.children.append(condition_to_resolve)
     root.children.append(Fallback())

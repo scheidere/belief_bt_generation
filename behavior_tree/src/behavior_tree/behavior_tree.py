@@ -338,6 +338,7 @@ class BehaviorTree:
 
         self.active_actions_pub = rospy.Publisher('active_actions', String, queue_size=1)
 
+
     def generate_nodes_list(self):
         # This function fills in self.nodes
         # Note that if parse_config is used, this is not necessary (done internally)
@@ -349,6 +350,8 @@ class BehaviorTree:
 
         # Empty the list, since it's going to be completed regenerated here
         self.nodes = []
+
+        print('generate_nodes_list called')
 
         # Setup a stack data structure (similar to nodes_worklist)
         nodes_stack = []

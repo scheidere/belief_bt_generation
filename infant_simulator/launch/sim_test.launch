@@ -2,7 +2,7 @@
 
 <launch>
 
-	<node pkg="infant_simulator" type="run_simulator.py" name="underwater_simulator" output="screen">
+	<node pkg="infant_simulator" type="run_simulator.py" name="infant_simulator" output="screen">
 
 	</node>
 </launch>
