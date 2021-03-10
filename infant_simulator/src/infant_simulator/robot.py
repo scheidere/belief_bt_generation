@@ -213,13 +213,13 @@ class Robot:
         
         self.set_action_status() #??? # Actions: Success, Failure, or Running
 
-        action = self.move_toward(self.known_world)
+        #action = self.move_toward(self.known_world)
         # action = self.move_away(self.known_world)
         #action = self.spin()
 
         # ??? DOES THIS NEED TO BE IN A LOOP
 
-        return action, active_actions
+        return active_actions
 
     def condition_updates(self):
         """
@@ -551,14 +551,15 @@ class Controller:
             self.world.infant_pos_update()
             self.world.robot_pos_update()
             self.world.world_plot()
-            robot_action, active_actions = self.robot.do_iteration()
+            active_actions = self.robot.do_iteration()
+            print(active_actions)
 
             print("Active ids: ", self.robot.bt.active_ids)
 
             num_iterations += 1
             
-            if robot_action == True:
-                robot_action = 1
+            #if robot_action == True:
+                #robot_action = 1
             
             # print("Robot location is: ", self.robot.robot_pos)
 
@@ -569,7 +570,7 @@ class Controller:
             # we call infant_step only 20% of the time and infant does action
             # if random number > 10:
                 # we decided to do something different
-            infant_action = self.infant.infant_step(self.robot.robot_pos, robot_action, self.world.centers)
+            ####infant_action = self.infant.infant_step(self.robot.robot_pos, robot_action, self.world.centers)
 
             # print('Infant action: ', infant_action)
             time.sleep(3)
