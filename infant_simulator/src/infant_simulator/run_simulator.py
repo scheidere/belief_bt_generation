@@ -28,7 +28,7 @@ class InfantSimulator:
         self.num_objects = p.n_objects
         self.world_x = p.x_dim
         self.world_y = p.y_dim
-        path = '/home/ahelmi/infant_sim/src/behavior_tree/config/infant_test.tree'
+        path = '/home/ahelmi/infant_sim/src/behavior_tree/config/infant_manual_tree.tree'
         self.bt = self.get_behavior_tree(path)
         config = 1
 

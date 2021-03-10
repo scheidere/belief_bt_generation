@@ -250,8 +250,15 @@ class Robot:
         self.bt_interface.setConditionStatus('solitary_play', is_in_sp)
         self.bt_interface.setConditionStatus('child_moving_toward', is_moving_toward)
         self.bt_interface.setConditionStatus('child_moving_away', is_moving_away)
+        self.bt_interface.setConditionStatus('child_stationary', is_stationary)
         # self.bt_interface.setConditionStatus('occluded', is_occluded)
         # ... more conditions
+        print("dsi", is_in_dsi)
+        print("si", is_in_si)
+        print("sp", is_in_sp)
+        print("toward", is_moving_toward)
+        print("away", is_moving_away)
+        print("stat", is_stationary)
 
     def move_toward(self, world_space):
         """

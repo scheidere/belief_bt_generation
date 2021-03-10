@@ -32,6 +32,10 @@ class Scorer():
         self.detection_rewarded_tracker = np.zeros(self.world.num_nodes, dtype=bool)
         self.action_rewarded_tracker = np.zeros(self.world.num_nodes, dtype=bool)
 
+    def infant_sim_reward(self, conditions, active_actions):
+        # if condition child_moving_toward is true, we get positive reward cuz you did a good
+        # otherwise, you stink and get nothing
+        return True
 
     def action_reward(self, vertex_idx, y): #Check with Graeme DONE
         '''

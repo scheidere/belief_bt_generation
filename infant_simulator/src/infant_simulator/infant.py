@@ -186,10 +186,14 @@ class Infant:
         dist_cat = self.infant2robot_dist(robot_pos)
         # find active action and if success, check the probability against the table. 
         # if failure, use default rate
-        if active_actions == None:
-            robot_action = 'idle' # idle, as if no action happened
-        else:
+        try:
             robot_action = p.agent_actions[active_actions[0]]
+        except:
+            robot_action = p.agent_actions['idle']
+        # if active_actions == None:
+        #     robot_action = 'idle' # idle, as if no action happened
+        # else:
+        #     robot_action = p.agent_actions[active_actions[0]]
         action_prob = self.inf_table[dist_cat, robot_action]
         print("probability of response by infant: ", action_prob)
 
