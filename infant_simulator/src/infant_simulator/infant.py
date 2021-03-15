@@ -154,10 +154,10 @@ class Infant:
         """
         time_step = 1
         # get random number for checking if action happens
-        check_val = np.random.random()
+        check_val = 0.1 #CHANGED#np.random.random()
         # e.g.: if robot action = bubbles, infant does action with X% probability
         #action_prob = self.inf_table[agent_action[0]][agent_action[1]]
-        action_prob = 0.3
+        action_prob = 0.2 #if above .2 child always moves toward
         if check_val <= action_prob:
             # success, infant moves towards robot
             print("Infant is now moving toward the robot")

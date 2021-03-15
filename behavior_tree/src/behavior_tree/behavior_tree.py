@@ -36,7 +36,7 @@ ReturnStatus.SUCCESS = ReturnStatus(Status.SUCCESS)
 #================================================================================================================
 
 class Node(object):
-    max_wait_time = 1.0
+    max_wait_time = 1000.0
     def __init__(self, label):
         self.label = label
         self.children = []
@@ -192,8 +192,10 @@ class Condition(ExecutionNode):
                 return
         
         if self.is_active == False and active == True and self.status == ReturnStatus.FAILURE:
+            print('Condition status being changed 1')
             self.set_status(ReturnStatus.FAILURE)#RUNNING)
         if self.get_status_age() > self.max_wait_time:
+            print('Condition status being changed 2')
             self.set_status(ReturnStatus.FAILURE)
         
         self.is_active = active
@@ -334,7 +336,7 @@ class BehaviorTree:
         if config_filename != '':
             self.parse_config(config_filename)
 
-        Node.max_wait_time = rospy.get_param('~timeout', 1.0)
+        Node.max_wait_time = 1000#rospy.get_param('~timeout', 1.0)
 
         self.active_actions_pub = rospy.Publisher('active_actions', String, queue_size=1)
 
@@ -579,6 +581,7 @@ class BehaviorTree:
             # Make sure that if there are more than one of the same action, if any are active, then active should be published
             unique_action_nodes = {}
             for node in self.nodes:
+                print(node.label, node.status.status)
                 if isinstance(node, Action):
                     if node.label not in unique_action_nodes.keys() or node.is_active:
                         #if node.is_active:
