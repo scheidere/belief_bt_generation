@@ -797,7 +797,7 @@ class BeliefBehaviorTree:
             self.root.tick_mem(mem, from_num = 0) # changed for BBT
             #print()
 
-            ??? figure out how to track root return status and update each tuple in belief state, i.e. (prob, state, root_return_status)
+            ##??? figure out how to track root return status and update each tuple in belief state, i.e. (prob, state, root_return_status)
 
 
             self.traversal_count += 1

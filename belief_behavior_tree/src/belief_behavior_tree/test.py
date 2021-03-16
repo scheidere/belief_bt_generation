@@ -2,7 +2,8 @@
 
 import yaml
 import copy
-from world_simulator.state import State
+from infant_simulator.state import State
+#from world_simulator.state import State
 from belief_state import BeliefState, combine
 from behavior_tree.behavior_tree import * #BehaviorTree, Sequence, ControlFlowNode
 from refine_tree import *

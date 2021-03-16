@@ -2,7 +2,14 @@
 import yaml
 import rospkg
 import rospy
-from behavior_tree.behavior_tree import *
+
+
+# Passed testing with behavior tree
+#from behavior_tree.behavior_tree import *
+
+# Now testing with belief behavior tree
+from behavior_tree.belief_behavior_tree import *
+
 from behavior_tree_msgs.msg import Status, Active
 
 import behavior_tree.behavior_tree_graphviz as gv

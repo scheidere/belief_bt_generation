@@ -13,7 +13,12 @@ from parameters import Parameters as p
 # import planners
 import random
 from bt_interface import *
-from behavior_tree.behavior_tree import *
+
+# old way
+#from behavior_tree.behavior_tree import *
+
+# new way
+from behavior_tree.belief_behavior_tree import *
 
 import numpy as np
 import time

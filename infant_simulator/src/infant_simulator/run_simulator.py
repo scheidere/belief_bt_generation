@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 '''
-For Ameer and Ryan testing
 Emily Scheide
 Oregon State University
 '''
@@ -19,7 +18,8 @@ import numpy as np
 from parameters import Parameters as p
 # import statistics as stats
 
-from behavior_tree.behavior_tree import BehaviorTree
+#from behavior_tree.behavior_tree import BehaviorTree
+from behavior_tree.belief_behavior_tree import BeliefBehaviorTree
 
 class InfantSimulator:
     def __init__(self):
@@ -46,7 +46,8 @@ class InfantSimulator:
         self.controller.run()
 
     def get_behavior_tree(self, path_to_tree_file):
-        return BehaviorTree(path_to_tree_file)
+        #return BehaviorTree(path_to_tree_file)
+        return BeliefBehaviorTree(path_to_tree_file)
 
 
     def generateReward(self, word, max_iterations):

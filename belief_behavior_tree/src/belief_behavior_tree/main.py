@@ -57,6 +57,11 @@ def yaml_test():
 if __name__ == '__main__':
     yaml_test()
 
+    # Get initial bbt/bt
+
+    # Pass bt to simulator and execute for a single timestep (???)
+    
+
 
 # move
 # update belief (with info from world not func within refine tree)
