@@ -187,19 +187,19 @@ class BT_Interface():
             nodes = self.condition_nodes[condition]
         except KeyError:
             pass
-            print("setConditionStatus condition " + condition + " does not exist in BT")
+            #print("setConditionStatus condition " + condition + " does not exist in BT")
         else:
             # Set the status of a condition to SUCCESS or FAILURE
             if success == True:
                 for node in nodes:
-                    print("setConditionStatus condition " + condition + " success")
+                    #print("setConditionStatus condition " + condition + " success")
                     node.set_status(ReturnStatus(Status.SUCCESS))
-                    print('node status', node.status.status)
+                    #print('node status', node.status.status)
             elif success == False:
                 for node in nodes:
-                    print("setConditionStatus condition " + condition + " failure")
+                    #print("setConditionStatus condition " + condition + " failure")
                     node.set_status(ReturnStatus(Status.FAILURE))
-                    print('node status', node.status.status)
+                    #print('node status', node.status.status)
             else:
                 print("setConditionStatus: incorrect argument")
 

@@ -24,22 +24,31 @@ class World():
         self.num_objects = p.n_objects
         self.world_x = p.x_dim
         self.world_y = p.y_dim
-        self.bubble_cap = p.bubble_cap
-        self.bubble_use = 0 # bubble use counter
-        self.inf = Infant(p, infant_x, infant_y, infant_theta)
         self.objects = np.zeros((self.num_objects, 4), dtype=(float,2))
         self.centers = np.zeros((self.num_objects,2))
+        
+        # UNCOMMENT IF YOU WANT OBSTACLES
+        #self.gen_world_objects(self.num_objects)
+
+        # set up bubble cap
+        self.bubble_cap = p.bubble_cap
+        self.bubble_use = 0 # bubble use counter
+
+        # make an infant
+        self.inf = Infant(infant_x, infant_y, infant_theta)
         self.infant_pos_update() # sets self.infant_pos
-        self.gen_world_objects(self.num_objects)
-        # self.world_plot()
+        self.old_infant_pos = None
+
+
+        # plotting config
         self.h_state = None
         self.infant_plot = 0
         self.robot_plot = 0
         self.infant_plot_arrow = 0
         self.robot_plot_arrow = 0
         self.image_counter = 0
+        self.markercolor = None
 
-        self.old_infant_pos = None
 
     def infant_pos_update(self):
         self.infant_pos = self.inf.infant_pos
@@ -51,6 +60,18 @@ class World():
 
     def robot_create(self, robot):
         self.robot = robot
+
+    def change_robot_plot_color(self, robot_action=None):
+        if robot_action == None:
+            self.markercolor = None
+        elif robot_action == 'bubbles':
+            self.markercolor = 'b'
+        elif robot_action == 'lights':
+            self.markercolor = 'gold'
+        elif robot_action == 'sounds':
+            self.markercolor = 'black'
+        elif robot_action == 'spin':
+            self.markercolor = 'olive'
 
     def gen_world_objects(self, num_objects):
         """
@@ -90,26 +111,27 @@ class World():
                 plt.plot((self.objects[i][3][0],self.objects[i][0][0]),(self.objects[i][3][1],self.objects[i][0][1]),'r')
 
             self.infant_plot = plt.plot(self.infant_pos[0],self.infant_pos[1], marker=".", markersize=10)
-            self.robot_plot = plt.plot(self.robot_pos[0],self.robot_pos[1], marker=".", markersize=10)
+            self.robot_plot = plt.plot(self.robot_pos[0],self.robot_pos[1], marker=".", markersize=10) #, markerfacecolor='b')
             # get direction of infant and agent
             self.infant_plot_arrow = plt.plot([self.infant_pos[0], self.infant_pos[0]+endx], [self.infant_pos[1], self.infant_pos[1]+endy])
             self.robot_plot_arrow = plt.plot([self.robot_pos[0], robx+self.robot_pos[0]], [self.robot_pos[1], roby+self.robot_pos[1]])
             fig.canvas.draw()
             self.h_state = True
-            plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+            
         else:
             self.image_counter += 1
             self.infant_plot[0].set_xdata(self.infant_pos[0])
             self.infant_plot[0].set_ydata(self.infant_pos[1])
             self.robot_plot[0].set_xdata(self.robot_pos[0])
             self.robot_plot[0].set_ydata(self.robot_pos[1])
+            self.robot_plot[0].set_markerfacecolor(self.markercolor)
             self.robot_plot_arrow[0].set_data([self.robot_pos[0], self.robot_pos[0]+robx], [self.robot_pos[1], self.robot_pos[1]+roby])
             self.infant_plot_arrow[0].set_data([self.infant_pos[0], self.infant_pos[0]+endx], [self.infant_pos[1], self.infant_pos[1]+endy])
 
             fig.canvas.draw()
             plt.pause(0.1)
-            plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
-
+        #plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+        #plt.savefig("/home/ahelmi/infant_sim/src/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
     def bubbles(self):
         """
         iterate bubble counter or return false if we are over
@@ -121,3 +143,5 @@ class World():
             self.bubble_use += 1
 
         return True
+
+

@@ -7,7 +7,7 @@ import yaml
 import matplotlib.pyplot as plt
 # from world import World
 # from world import distance
-# from scorer import Scorer
+from scorer import Scorer
 from parameters import Parameters as p
 # import copy
 # import planners
@@ -63,7 +63,7 @@ class State:
         #print('checking dsi')
 
         self.euclidean_diff = self.infant2robot_dist(world_space)
-        if self.euclidean_diff <= self.inf_close:
+        if self.euclidean_diff <= self.one_ft:
             # close, less than 1 ft
             self.euclidean_diff_cat = 1
             return True
@@ -79,7 +79,7 @@ class State:
         #print('checking si')
 
         self.euclidean_diff = self.infant2robot_dist(world_space)
-        if self.euclidean_diff <= self.inf_near:
+        if self.three_ft >= self.euclidean_diff > self.one_ft:
             # near, 1ft - 3ft
             self.euclidean_diff_cat = 2
             return True
@@ -95,7 +95,7 @@ class State:
         #print('checking sp')
 
         self.euclidean_diff = self.infant2robot_dist(world_space)
-        if self.euclidean_diff > self.inf_near:
+        if self.euclidean_diff > self.three_ft:
             # far, more than 3 ft
             self.euclidean_diff_cat = 3
             return True
@@ -202,13 +202,38 @@ class Robot:
         """
         self.robot_pos = self.robot_start_pos
 
+    def do_random(self):
+        number = np.random.randint(0, 7)
+        if number == 0:
+            active_actions = ['move_toward']
+            action = self.move_toward(self.known_world)
+        elif number == 1:
+            active_actions = ['move_away']
+            action = self.move_away(self.known_world)
+        elif number == 2:
+            active_actions = ['spin']
+            action = self.spin(self.known_world)
+        elif number == 3:
+            active_actions = ['bubbles']
+            action = self.bubbles(self.known_world)
+        elif number == 4:
+            active_actions = ['lights']
+            action = self.lights(self.known_world)
+        elif number == 5:
+            active_actions = ['sounds']
+            action = self.sounds(self.known_world)
+        elif number == 6:
+            active_actions = ['idle']
+            action = self.idle(self.known_world)
+        return active_actions
+
     def do_iteration(self):
 
-        print('Checking BT node statuses...')
-        for node in self.bt.nodes:
-            print(node.label, node.status.status)
+        #print('Checking BT node statuses...')
+        # for node in self.bt.nodes:
+        #     print(node.label, node.status.status)
 
-        print("++++++++++++++++++++++")
+        #print("++++++++++++++++++++++")
         # print('Checking BT node statuses from bt interface...')
         # for node in self.bt_interface.bt.nodes:
         #     print(node.label, node.status.status)
@@ -216,9 +241,9 @@ class Robot:
         # print("++++++++++++++++++++++")
 
         self.bt_interface.tick_bt()
-        print('Checking BT node statuses PART TWO...')
-        for node in self.bt.nodes:
-            print(node.label, node.status.status)
+        # print('Checking BT node statuses PART TWO...')
+        # for node in self.bt.nodes:
+        #     print(node.label, node.status.status)
 
         print("++++++++++++++++++++++")
 
@@ -230,16 +255,23 @@ class Robot:
             print("ACTION EXECUTION: Moving toward!")
             self.move_toward(self.known_world)
 
+        if 'move_away' in active_actions:
+
+            print("ACTION EXECUTION: Moving away! Aaaaahhh!")
+            self.move_away(self.known_world)
+
+        #...
+
 
         #if 'move_away' in active_actions: # FINISH THIS FOR CALLS BELOW
 
 
-        self.move_away(self.known_world)
-        self.spin()
-        self.idle()
+        #self.move_away(self.known_world)
+        self.spin(self.known_world)
+        self.idle(self.known_world)
         self.bubbles(self.known_world)
-        self.lights()
-        self.sounds()
+        self.lights(self.known_world)
+        self.sounds(self.known_world)
 
         self.condition_updates()  # Conditions: Success or Failure
         
@@ -288,6 +320,13 @@ class Robot:
         # self.bt_interface.setConditionStatus('occluded', is_occluded)
         # ... more conditions
 
+    def get_quotient(self, delta_y, delta_x):
+
+        try:
+            return delta_y/delta_x
+        except ZeroDivisionError:
+            return np.inf
+
     def move_toward(self, world_space):
         """
         move towards the infant based on the time step
@@ -298,37 +337,53 @@ class Robot:
 
         #active_actions = self.bt_interface.getActiveActions()
 
-        
+        print("current pos: ", self.robot_pos)
 
-        ### NEEDS TIME STEP ####
+        world_space.change_robot_plot_color()
+
+
+        # 0,0 is at bottom left of world map
+        # Baseline orientation 0 is to the right
+
+        delta_x = world_space.infant_pos[0] - self.robot_pos[0] 
+        delta_y = world_space.infant_pos[1] - self.robot_pos[1]
+
+        #xy_quotient = self.get_quotient(delta_y, delta_x)
+
+        # if delta_x == 0:
+        #     delta_x = 0.0001
+        # if delta_y == 0:
+        #     delta_y = 0.0001
+
+        theta_new = np.arctan2(delta_y,delta_x)
 
         time_step = 1
-        # move towards the infant
-        if (self.robot_pos[0] == world_space.infant_pos[0]) or (self.robot_pos[1] == world_space.infant_pos[1]):
-            # lie along one of the parallels
-            if self.robot_pos[0] == world_space.infant_pos[0]:
-                # lie along x, check which y is bigger for direction
-                if self.robot_pos[1] > world_space.infant_pos[1]:
-                    theta_new = np.pi/2
-                else:
-                    theta_new = 3*np.pi/2
-            else:
-                if self.robot_pos[0] > world_space.infant_pos[0]:
-                    theta_new = np.pi
-                else:
-                    theta_new = 0
-        if (self.robot_pos[0] < world_space.infant_pos[0]) and (self.robot_pos[1] < world_space.infant_pos[1]):
-            # top right quadrant movement
-            theta_new = np.random.uniform(0, np.pi/2)
-        elif (self.robot_pos[0] > world_space.infant_pos[0]) and (self.robot_pos[1] < world_space.infant_pos[1]):
-            # top left quadrant movement
-            theta_new = np.random.uniform(np.pi/2,np.pi)
-        elif (self.robot_pos[0] < world_space.infant_pos[0]) and (self.robot_pos[1] > world_space.infant_pos[1]):
-            # bottom right quadrant movement
-            theta_new = np.random.uniform((3*np.pi)/2, 2*np.pi)
-        else:
-            # bottom left quadrant movement
-            theta_new = np.random.uniform(np.pi, 3*np.pi/2)
+        # # move towards the infant
+        # if (self.robot_pos[0] == world_space.infant_pos[0]) or (self.robot_pos[1] == world_space.infant_pos[1]):
+        #     # lie along one of the parallels
+        #     if self.robot_pos[0] == world_space.infant_pos[0]:
+        #         # lie along x, check which y is bigger for direction
+        #         if self.robot_pos[1] > world_space.infant_pos[1]:
+        #             theta_new = np.pi/2
+        #         else:
+        #             theta_new = 3*np.pi/2
+        #     else:
+        #         if self.robot_pos[0] > world_space.infant_pos[0]:
+        #             theta_new = np.pi
+        #         else:
+        #             theta_new = 0
+        # if (self.robot_pos[0] < world_space.infant_pos[0]) and (self.robot_pos[1] < world_space.infant_pos[1]):
+        #     # top right quadrant movement
+        #     theta_new = np.random.uniform(0, np.pi/2)
+        # elif (self.robot_pos[0] > world_space.infant_pos[0]) and (self.robot_pos[1] < world_space.infant_pos[1]):
+        #     # top left quadrant movement
+        #     theta_new = np.random.uniform(np.pi/2,np.pi)
+        # elif (self.robot_pos[0] < world_space.infant_pos[0]) and (self.robot_pos[1] > world_space.infant_pos[1]):
+        #     # bottom right quadrant movement
+        #     theta_new = np.random.uniform((3*np.pi)/2, 2*np.pi)
+        # else:
+        #     # bottom left quadrant movement
+        #     theta_new = np.random.uniform(np.pi, 3*np.pi/2)
 
         # move it!
         x_new = self.robot_pos[0] + self.d_vel * time_step * np.cos(theta_new)
@@ -339,9 +394,12 @@ class Robot:
         illegal = self.collision_detection(world_space.objects, x_new, y_new, world_space.world_x, world_space.world_y)
         if not illegal:
             self.robot_pos = [x_new, y_new, theta_new]
+            print('new pos: ', self.robot_pos)
             return True
+        else:
+            print('Illegal move...')
 
-        return False
+        return False # leaving for when you uncomment illegal stuff
 
 
     def move_away(self, world_space):
@@ -350,55 +408,58 @@ class Robot:
         :return:
         """
 
-        active_actions = self.bt_interface.getActiveActions()
+        print("current pos: ", self.robot_pos)
 
-        if 'move_away' in active_actions:
+        world_space.change_robot_plot_color()
 
-            print("ACTION EXECUTION: Moving away! Aaaaahhh!")
+        delta_x = world_space.infant_pos[0] - self.robot_pos[0] 
+        delta_y = world_space.infant_pos[1] - self.robot_pos[1]
 
-            ### NEEDS TIME STEP ####
+        theta_new = np.arctan2(delta_y,delta_x) + np.pi
 
-            time_step = 1
-            if (self.robot_pos[0] == world_space.infant_pos[0]) or (self.robot_pos[1] == world_space.infant_pos[1]):
-                # lie along one of the parallels
-                if self.robot_pos[0] == world_space.infant_pos[0]:
-                    # lie along x, check which y is bigger for direction
-                    if self.robot_pos[1] > world_space.infant_pos[1]:
-                        theta_new = 3*np.pi/2
-                    else:
-                        theta_new = np.pi/2
-                else:
-                    if self.robot_pos[0] > world_space.infant_pos[0]:
-                        theta_new = 0
-                    else:
-                        theta_new = np.pi
-            if (self.robot_pos[0] < world_space.infant_pos[0]) and (self.robot_pos[1] < world_space.infant_pos[1]):
-                # bottom left quadrant movement
-                theta_new = np.random.uniform(np.pi, 3*np.pi/2)
 
-            elif (self.robot_pos[0] > world_space.infant_pos[0]) and (self.robot_pos[1] < world_space.infant_pos[1]):
-                # bottom right quadrant movement
-                theta_new = np.random.uniform((3*np.pi)/2, 2*np.pi)
-            elif (self.robot_pos[0] < world_space.infant_pos[0]) and (self.robot_pos[1] > world_space.infant_pos[1]):
-                # top left quadrant movement
-                theta_new = np.random.uniform(np.pi/2,np.pi)
-            else:
-                # top right quadrant movement
-                theta_new = np.random.uniform(0, np.pi/2)
+        time_step = 1
+        # if (self.robot_pos[0] == world_space.infant_pos[0]) or (self.robot_pos[1] == world_space.infant_pos[1]):
+        #     # lie along one of the parallels
+        #     if self.robot_pos[0] == world_space.infant_pos[0]:
+        #         # lie along x, check which y is bigger for direction
+        #         if self.robot_pos[1] > world_space.infant_pos[1]:
+        #             theta_new = 3*np.pi/2
+        #         else:
+        #             theta_new = np.pi/2
+        #     else:
+        #         if self.robot_pos[0] > world_space.infant_pos[0]:
+        #             theta_new = 0
+        #         else:
+        #             theta_new = np.pi
+        # if (self.robot_pos[0] < world_space.infant_pos[0]) and (self.robot_pos[1] < world_space.infant_pos[1]):
+        #     # bottom left quadrant movement
+        #     theta_new = np.random.uniform(np.pi, 3*np.pi/2)
 
-            # move it!
-            x_new = self.robot_pos[0] + self.d_vel * time_step * np.cos(theta_new)
-            y_new = self.robot_pos[1] + self.d_vel * time_step * np.sin(theta_new)
+        # elif (self.robot_pos[0] > world_space.infant_pos[0]) and (self.robot_pos[1] < world_space.infant_pos[1]):
+        #     # bottom right quadrant movement
+        #     theta_new = np.random.uniform((3*np.pi)/2, 2*np.pi)
+        # elif (self.robot_pos[0] < world_space.infant_pos[0]) and (self.robot_pos[1] > world_space.infant_pos[1]):
+        #     # top left quadrant movement
+        #     theta_new = np.random.uniform(np.pi/2,np.pi)
+        # else:
+        #     # top right quadrant movement
+        #     theta_new = np.random.uniform(0, np.pi/2)
 
-            # Boundary checking -- if the new positions are illegal, reject and set collision = true
-            # Keep the previous coordinates
-            illegal = self.collision_detection(world_space.objects, x_new, y_new, world_space.world_x, world_space.world_y)
-            if not illegal:
-                self.robot_pos = [x_new, y_new, theta_new]
-                return True
+        # move it!
+        x_new = self.robot_pos[0] + self.d_vel * time_step * np.cos(theta_new)
+        y_new = self.robot_pos[1] + self.d_vel * time_step * np.sin(theta_new)
 
-            return False
-        return None
+        # Boundary checking -- if the new positions are illegal, reject and set collision = true
+        # Keep the previous coordinates
+        illegal = self.collision_detection(world_space.objects, x_new, y_new, world_space.world_x, world_space.world_y)
+        if not illegal:
+            self.robot_pos = [x_new, y_new, theta_new]
+            print('new pos: ', self.robot_pos)
+            return True
+
+        return False
+
 
     def bubbles(self, world_space):
         """
@@ -414,11 +475,12 @@ class Robot:
             print("ACTION EXECUTION: Blowing bubbles! Ultimate party time!")
 
             action = world_space.bubbles()
+            world_space.change_robot_plot_color('bubbles')
             return action
 
         return None
 
-    def idle(self):
+    def idle(self, world_space):
         """
         function for the robot to stand still
         :return:
@@ -429,13 +491,13 @@ class Robot:
         if 'idle' in active_actions:
 
             print("ACTION EXECUTION: Idle, doing nothing! Not party time!")
-
+            world_space.change_robot_plot_color()
             # robot location does not change, just return true this action happened
             return True
 
         return None
 
-    def spin(self):
+    def spin(self, world_space):
         """
         function for the robot to spin in place
         """
@@ -449,11 +511,12 @@ class Robot:
             # spin to a random orientation
             theta_new = np.random.uniform(0, 2 * np.pi)
             self.robot_pos = [self.robot_pos[0], self.robot_pos[1], theta_new]
+            world_space.change_robot_plot_color('spin')
             return True
 
         return None
 
-    def lights(self):
+    def lights(self, world_space):
         """
         function for the robot to flash Lights
         :return:
@@ -465,12 +528,12 @@ class Robot:
         if 'lights' in active_actions:
 
             print("ACTION EXECUTION: Flashing lights! Time to party!")
-
+            world_space.change_robot_plot_color('lights')
             return True
 
         return None
 
-    def sounds(self):
+    def sounds(self, world_space):
         """
         function for the robot to play sounds
         :return:
@@ -482,7 +545,7 @@ class Robot:
         if 'sounds' in active_actions:
 
             print("ACTION EXECUTION: Making sound! Time to party!")
-
+            world_space.change_robot_plot_color('sounds')
             return True
 
         return None
@@ -569,9 +632,10 @@ class Controller:
         :return:
         """
         # start_time = rospy.Time.now()
+        score = Scorer()
         num_iterations = 0
 
-        rospy.Rate(1) # 1hz
+        r = rospy.Rate(1) # 1hz
         while not rospy.is_shutdown():# and num_iterations < 10:
             #for i in range(10): # test loop, need to use above ros method
             print(' ')
@@ -582,71 +646,19 @@ class Controller:
             active_actions = self.robot.do_iteration()
             print(active_actions)
 
-            print("Active ids: ", self.robot.bt.active_ids)
+            #print("Active ids: ", self.robot.bt.active_ids)
 
             num_iterations += 1
             
-            #if robot_action == True:
-                #robot_action = 1
-            
-            # print("Robot location is: ", self.robot.robot_pos)
-
-            # INCOMPLETE: Infant reaction to robot action
-            # if active_actions == Running???
-            # we return active actions above, meaning all active actions (just one prob) infant can react to 
-            # infant iteration?
-            # we call infant_step only 20% of the time and infant does action
             # if random number > 10:
                 # we decided to do something different
             infant_action = self.infant.infant_step(self.robot.robot_pos, active_actions, self.world.centers)
+            score.infant_sim_reward(infant_action, self.robot.state.infant2robot_dist(self.world))
 
             # print('Infant action: ', infant_action)
-            time.sleep(3)
+            r.sleep()
             
-
-            
-        # INCOMPLETE: will need to create scorer and return score
-        return 1  # self.robot.basestation_scorer.score, self.robot.has_reported, self.robot.basestation_scorer.belief_distance
+        return score.score, score.distance  
 
 
 
-# # Main function.
-# if __name__ == '__main__':
-    
-#     # Initialise the node
-#     rospy.init_node('robot')
-#     # Get the config file etc
-#     rospack = rospkg.RosPack()
-#     filepath = rospack.get_path('simulator') + "/config/" + rospy.get_param('~config')
-#     with open(filepath, 'r') as stream:
-#         config = yaml.safe_load(stream)
-#     robot_id = rospy.get_param('~robot_id')
-#     num_robots = rospy.get_param('~num_robots')
-#     seed = rospy.get_param('~seed')
-
-#     try:
-#         # cfg_word = createWord('?  (  ->  (  (in_comms)  ?  (  (battery_low)  [random_walk]  )  )  ->  (  ?  (  [go_to_comms]  [report]  )  [report]  ?  (  (at_surface)  (benign_object_found)  [take_to_drop_off]  )  )  )')
-#         # bt_root, bt = cfg_word.createBT()
-
-#         cfg_word = createWord('?  (  ->  (  (is_armed)  [disarm]  )  ->  (  ?  (  [shortest_path]  [shortest_path]  [shortest_path]  )  ?  (  [shortest_path]  [shortest_path]  [shortest_path]  [shortest_path]  )  )  ) ')
-#         bt_root, bt = cfg_word.createBT()
-
-        
-#         max_iterations = 1000
-
-#         # Create the world
-#         world = World(config)
-#         do_test = True # don't error check graph
-
-#         world.init_world(seed, do_test)
-
-#         robot = Robot(config, robot_id, num_robots, seed, bt, max_iterations, world)
-#         # cProfile.run('RobotController(config, robot)')
-#         robot_controller = RobotController(config, robot)
-#         score, target_reported, distance = robot_controller.run()
-#         print('Score: ', score)
-#         if target_reported:
-#             print('Has reported:', target_reported, 'not necessarily correctly')
-#         else:
-#             print('Has reported:', target_reported)
-#     except rospy.ROSInterruptException: pass

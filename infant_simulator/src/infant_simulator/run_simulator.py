@@ -28,7 +28,7 @@ class InfantSimulator:
         self.num_objects = p.n_objects
         self.world_x = p.x_dim
         self.world_y = p.y_dim
-        path = '/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_test.tree'
+        path = '/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/move_away.tree'
         self.bt = self.get_behavior_tree(path)
         config = 1
 

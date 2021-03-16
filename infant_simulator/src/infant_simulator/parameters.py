@@ -32,5 +32,8 @@ class Parameters:
     n_objects = 3 # Number of toys in the environment
 
 
-    agent_actions = {0:"Move away",1:"Move towards",2:"idle",3:"spin",4:"lights",5:"bubbles",6:"sound",7:"light_sound",8:"lights_bubbles",9:"sound_bubbles"}
+    agent_actions = {"move_toward": 0, "move_away": 1, "idle": 2, "spin": 3, "bubbles": 4,"lights": 5, "sounds": 6}
     infant_actions = {0:"Move towards",1:"Move away",2:"Move to object",3:"spin around",4:"stay still"}
+
+    #agent_actions = {0:"Move away",1:"Move towards",2:"idle",3:"spin",4:"lights",5:"bubbles",6:"sound",7:"light_sound",8:"lights_bubbles",9:"sound_bubbles"}
+    #infant_actions = {0:"Move towards",1:"Move away",2:"Move to object",3:"spin around",4:"stay still"}
