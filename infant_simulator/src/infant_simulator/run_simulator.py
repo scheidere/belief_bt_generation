@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
 '''
-Behavior Tree Reward Return 
-(Skeleton code for future simulation-generated reward)
+For Ameer and Ryan testing
 Emily Scheide
 Oregon State University
-March 2020
 '''
 
 import rospy
