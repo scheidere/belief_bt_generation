@@ -1,3 +1,0 @@
-int32 requesting_robot_id
-geometry_msgs/Point location
-float64 radius
