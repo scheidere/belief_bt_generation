@@ -98,7 +98,7 @@ if __name__ == '__main__':
     rospy.init_node('infant_simulator')
     sim = InfantSimulator(bt = bbt)
 
-    while not rospy.is_shutdown() and num_iterations < 3:
+    while not rospy.is_shutdown() and num_iterations < 1:
         print('BT node list: ', sim.bt.nodes)
 
         current_score, current_distance, state = sim.run_sim(table_yaml, step_size, current_score, current_distance) #calls controller.run()
@@ -109,7 +109,7 @@ if __name__ == '__main__':
         print('State in belief state: ', current_belief_state.belief[0][1].state)
 
         #update bt using bbt method
-        #bbt = refine_tree(bbt, goal_prob, current_belief_state)
+        bbt = refine_tree(bbt, goal_prob, current_belief_state)
 
         sim.update_bt(bbt)
     

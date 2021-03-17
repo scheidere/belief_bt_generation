@@ -2,7 +2,7 @@
 
 import yaml
 import copy
-from infant_simulator.state import State
+from infant_simulator.state import WorldState as State
 #from world_simulator.state import State
 from belief_state import BeliefState, combine
 from behavior_tree.behavior_tree import * #BehaviorTree, Sequence, ControlFlowNode
@@ -374,13 +374,13 @@ if __name__ == "__main__":
     # yaml_test()
 
     init_state = general_state_test(table_yaml)
-    # print("INIT STATE", init_state) # all statuses running
-    # print(init_state.state)
+    print("INIT STATE", init_state) # all statuses running
+    print(init_state.state)
 
     # init_state.updateState(['occluded','social_interaction'],['F','S'])
     # print(init_state.state)
 
-    init_belief_state = general_belief_state_test(init_state, table_yaml)
+    #####init_belief_state = general_belief_state_test(init_state, table_yaml)
     # print('before', init_belief_state.belief)
 
     # after_action_belief_state = init_belief_state.apply_action_belief_state('move_toward')

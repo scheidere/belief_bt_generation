@@ -162,6 +162,94 @@ action_table:
         - 0.1:
           - [child_moving_toward, F]
 
+    -
+      action: bubbles
+      preconditions:
+        - [social_interaction, S]
+        #- [not_occluded, S] #### THIS NEEDS TO BE UNDER A DECORATOR OR IT IS WRONG #### Old way: [occluded, F] # might be best to just remove
+      postconditions:
+        - 0.9: # need to look these probs up
+          - [child_moving_toward, S]
+        - 0.1:
+          - [child_moving_toward, F]
+
+    -
+      action: bubbles
+      preconditions:
+        - [solitary_play, S]
+        #- [not_occluded, S] #### THIS NEEDS TO BE UNDER A DECORATOR OR IT IS WRONG #### Old way: [occluded, F] # might be best to just remove
+      postconditions:
+        - 0.9: # need to look these probs up
+          - [child_moving_toward, S]
+        - 0.1:
+          - [child_moving_toward, F]
+
+    -
+      action: lights
+      preconditions:
+        - [direct_social_interaction, S]
+        #- [not_occluded, S] #### THIS NEEDS TO BE UNDER A DECORATOR OR IT IS WRONG #### Old way: [occluded, F] # might be best to just remove
+      postconditions:
+        - 0.9: # need to look these probs up
+          - [child_moving_toward, S]
+        - 0.1:
+          - [child_moving_toward, F]
+
+    -
+      action: lights
+      preconditions:
+        - [social_interaction, S]
+        #- [not_occluded, S] #### THIS NEEDS TO BE UNDER A DECORATOR OR IT IS WRONG #### Old way: [occluded, F] # might be best to just remove
+      postconditions:
+        - 0.9: # need to look these probs up
+          - [child_moving_toward, S]
+        - 0.1:
+          - [child_moving_toward, F]
+
+    -
+      action: lights
+      preconditions:
+        - [solitary_play, S]
+        #- [not_occluded, S] #### THIS NEEDS TO BE UNDER A DECORATOR OR IT IS WRONG #### Old way: [occluded, F] # might be best to just remove
+      postconditions:
+        - 0.9: # need to look these probs up
+          - [child_moving_toward, S]
+        - 0.1:
+          - [child_moving_toward, F]
+
+    -
+      action: sounds
+      preconditions:
+        - [direct_social_interaction, S]
+        #- [not_occluded, S] #### THIS NEEDS TO BE UNDER A DECORATOR OR IT IS WRONG #### Old way: [occluded, F] # might be best to just remove
+      postconditions:
+        - 0.9: # need to look these probs up
+          - [child_moving_toward, S]
+        - 0.1:
+          - [child_moving_toward, F]
+
+    -
+      action: sounds
+      preconditions:
+        - [social_interaction, S]
+        #- [not_occluded, S] #### THIS NEEDS TO BE UNDER A DECORATOR OR IT IS WRONG #### Old way: [occluded, F] # might be best to just remove
+      postconditions:
+        - 0.9: # need to look these probs up
+          - [child_moving_toward, S]
+        - 0.1:
+          - [child_moving_toward, F]
+
+    -
+      action: sounds
+      preconditions:
+        - [solitary_play, S]
+        #- [not_occluded, S] #### THIS NEEDS TO BE UNDER A DECORATOR OR IT IS WRONG #### Old way: [occluded, F] # might be best to just remove
+      postconditions:
+        - 0.9: # need to look these probs up
+          - [child_moving_toward, S]
+        - 0.1:
+          - [child_moving_toward, F]
+
     # TBC...
 
     # bubbles:

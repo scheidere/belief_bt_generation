@@ -60,7 +60,7 @@ def getActionsConditions():
     # later can pull directly from table yaml
 
     actions = ['move_toward','move_away','idle','spin','bubbles','lights','sounds']
-    conditions = ['direct_social_interaction','social_interaction','solitary_play','child_moving_toward','child_moving_away'] # 'occluded']
+    conditions = ['direct_social_interaction','social_interaction','solitary_play','child_moving_toward','child_moving_away','child_stationary'] # 'occluded']
 
     return actions, conditions
 

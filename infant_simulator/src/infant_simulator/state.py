@@ -31,6 +31,7 @@ class WorldState:
             condition = condition_info_dictionary['condition']
             self.state[condition] = 'R' #default because unknown?
 
+
     def updateState(self, condition_string_list, status_list):
 
         for i in range(len(condition_string_list)):
@@ -40,21 +41,23 @@ class WorldState:
             self.state[condition_string_list[i]] = status_list[i]
 
 
-    def update_state(self, bt):
+    # def update_state(self, bt):
 
-        for node in bt.nodes:
-            print(node.label, node.status.status)
+    #     ??? this needs to check all conditions not just those in tree
 
-            if node.label in self.state.keys():
-                if node.status.status == 0: # failure
-                    status = 'F'
-                elif node.status.status == 1:
-                    status = 'R'
-                elif node.status.status == 2:
-                    status = 'S'
-                else:
-                    print('____________NODE STATUS ERROR____________')
+    #     for node in bt.nodes:
+    #         print(node.label, node.status.status)
 
-                self.state[node.label] = status
+    #         if node.label in self.state.keys():
+    #             if node.status.status == 0: # failure
+    #                 status = 'F'
+    #             elif node.status.status == 1:
+    #                 status = 'R'
+    #             elif node.status.status == 2:
+    #                 status = 'S'
+    #             else:
+    #                 print('____________NODE STATUS ERROR____________')
 
-            #if isinstance(node, Condition):
+    #             self.state[node.label] = status
+
+    #         #if isinstance(node, Condition):

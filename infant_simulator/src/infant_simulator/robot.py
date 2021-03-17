@@ -238,7 +238,7 @@ class Robot:
             action = self.idle(self.known_world)
         return active_actions
 
-    def do_iteration(self):
+    def do_iteration(self, table_yaml):
 
         #print('Checking BT node statuses...')
         # for node in self.bt.nodes:
@@ -284,7 +284,7 @@ class Robot:
         self.lights(self.known_world)
         self.sounds(self.known_world)
 
-        self.condition_updates()  # Conditions: Success or Failure
+        state = self.condition_updates(table_yaml)  # Conditions: Success or Failure
         
         self.set_action_status() #??? # Actions: Success, Failure, or Running
 
@@ -293,9 +293,9 @@ class Robot:
 
         # ??? DOES THIS NEED TO BE IN A LOOP. No.
 
-        return active_actions
+        return active_actions, state
 
-    def condition_updates(self):
+    def condition_updates(self, table_yaml):
         """
         Updates all conditions for the bt to observe
         :return:
@@ -316,7 +316,7 @@ class Robot:
         is_stationary = self.state.child_stationary(self, self.known_world)
 
         print("Is in dsi? ",is_in_dsi)
-        print("Is in si? ",is_in_si)
+        print("Is in si? ",is_in_dsi)
         print("Is in sp? ",is_in_sp)
         print("Is child moving toward? ", is_moving_toward)
         print("Is child moving away? ", is_moving_away)
@@ -328,8 +328,29 @@ class Robot:
         self.bt_interface.setConditionStatus('solitary_play', is_in_sp)
         self.bt_interface.setConditionStatus('child_moving_toward', is_moving_toward)
         self.bt_interface.setConditionStatus('child_moving_away', is_moving_away)
+        self.bt_interface.setConditionStatus('child_stationary', is_stationary)
         # self.bt_interface.setConditionStatus('occluded', is_occluded)
         # ... more conditions
+
+        # THIS ORDER MUST MATCH ORDER IN self.bt_interface.conditions list
+        status_list_temp = [is_in_dsi, is_in_dsi, is_in_sp, is_moving_toward, is_moving_away, is_stationary] # True, False form
+        status_list = []
+        for boolean in status_list_temp:
+            if not boolean: # failure
+                status = 'F'
+            # elif node.status.status == 1:
+            #     status = 'R'
+            elif boolean:
+                status = 'S'
+            status_list.append(status)
+
+        # Get state from bt statuses
+        state = WorldState(table_yaml)
+        state.updateState(self.bt_interface.conditions, status_list)
+        #state.update_state(self.bt)
+
+        return state
+
 
     def get_quotient(self, delta_y, delta_x):
 
@@ -657,7 +678,7 @@ class Controller:
             self.world.infant_pos_update()
             self.world.robot_pos_update()
             self.world.world_plot()
-            active_actions = self.robot.do_iteration()
+            active_actions, state = self.robot.do_iteration(table_yaml)
             print(active_actions)
 
             #print("Active ids: ", self.robot.bt.active_ids)
@@ -675,9 +696,6 @@ class Controller:
         final_score = score.score + starting_score
         final_distance = score.distance + starting_distance
 
-        # Get state from bt statuses
-        state = WorldState(table_yaml)
-        state.update_state(self.robot.bt)
             
         return final_score, final_distance, state
 
