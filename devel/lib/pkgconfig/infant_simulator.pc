@@ -1,8 +1,0 @@
-prefix=/home/ahelmi/infant_sim_testing/devel
-
-Name: infant_simulator
-Description: Description of infant_simulator
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

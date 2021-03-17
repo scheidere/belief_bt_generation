@@ -1,8 +1,0 @@
-prefix=/home/ahelmi/infant_sim_testing/install
-
-Name: behavior_tree
-Description: Description of behavior_tree
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib -lbehavior_tree
-Requires: roscpp rospy std_msgs behavior_tree_msgs

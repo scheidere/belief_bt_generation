@@ -1,8 +1,0 @@
-prefix=/home/ahelmi/infant_sim_testing/install
-
-Name: behavior_tree_msgs
-Description: Description of behavior_tree_msgs
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: message_runtime std_msgs

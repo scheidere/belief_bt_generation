@@ -1,7 +1,0 @@
-set(simulator_SETUP_PY_SETUP_MODULE "distutils.core")
-set(simulator_SETUP_PY_VERSION "0.0.0")
-set(simulator_SETUP_PY_SCRIPTS "")
-set(simulator_SETUP_PY_PACKAGES "simulator")
-set(simulator_SETUP_PY_PACKAGE_DIRS "src/simulator")
-set(simulator_SETUP_PY_MODULES "")
-set(simulator_SETUP_PY_MODULE_DIRS "")

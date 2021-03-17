@@ -1,2 +1,0 @@
-behavior_tree:behavior_tree_msgs:belief_behavior_tree:infant_simulator:old_simulator
--DCATKIN_DEVEL_PREFIX=/home/ahelmi/infant_sim_testing/devel -DCMAKE_INSTALL_PREFIX=/home/ahelmi/infant_sim_testing/install -G Unix Makefiles
