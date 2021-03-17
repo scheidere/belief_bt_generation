@@ -88,7 +88,7 @@ class World():
             self.objects[obj] = ((obj_x, obj_y), (obj_x + obj_w, obj_y), (obj_x + obj_w, obj_y + obj_h), (obj_x, obj_y + obj_h))
             self.centers[obj] = (obj_x + obj_w / 2, obj_y + obj_h / 2)
 
-    def world_plot(self):
+    def world_plot(self, iteration):
         """
         Whole plotter function that includes initializing, updating, and saving the plot.
         :return:
@@ -105,13 +105,14 @@ class World():
 
         if self.h_state == None:
             self.image_counter = 0
-            for i in range(self.num_objects):
-                for k in range(3):
-                    plt.plot((self.objects[i][k][0],self.objects[i][k+1][0]),(self.objects[i][k][1],self.objects[i][k+1][1]),'r')
-                plt.plot((self.objects[i][3][0],self.objects[i][0][0]),(self.objects[i][3][1],self.objects[i][0][1]),'r')
+            # for i in range(self.num_objects):
+            #     for k in range(3):
+            #         plt.plot((self.objects[i][k][0],self.objects[i][k+1][0]),(self.objects[i][k][1],self.objects[i][k+1][1]),'r')
+            #     plt.plot((self.objects[i][3][0],self.objects[i][0][0]),(self.objects[i][3][1],self.objects[i][0][1]),'r')
 
             self.infant_plot = plt.plot(self.infant_pos[0],self.infant_pos[1], marker=".", markersize=10)
             self.robot_plot = plt.plot(self.robot_pos[0],self.robot_pos[1], marker=".", markersize=10) #, markerfacecolor='b')
+            plt.text(4.5, 5.5, iteration, fontsize=10)
             # get direction of infant and agent
             self.infant_plot_arrow = plt.plot([self.infant_pos[0], self.infant_pos[0]+endx], [self.infant_pos[1], self.infant_pos[1]+endy])
             self.robot_plot_arrow = plt.plot([self.robot_pos[0], robx+self.robot_pos[0]], [self.robot_pos[1], roby+self.robot_pos[1]])
@@ -127,11 +128,12 @@ class World():
             self.robot_plot[0].set_markerfacecolor(self.markercolor)
             self.robot_plot_arrow[0].set_data([self.robot_pos[0], self.robot_pos[0]+robx], [self.robot_pos[1], self.robot_pos[1]+roby])
             self.infant_plot_arrow[0].set_data([self.infant_pos[0], self.infant_pos[0]+endx], [self.infant_pos[1], self.infant_pos[1]+endy])
-
+            plt.text(4.5, 5.5, iteration, fontsize=10)
             fig.canvas.draw()
             plt.pause(0.1)
         #plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
-        #plt.savefig("/home/ahelmi/infant_sim/src/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+        plt.savefig("/home/ahelmi/infant_sim_testing/src/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+    
     def bubbles(self):
         """
         iterate bubble counter or return false if we are over
