@@ -1,0 +1,7 @@
+set(infant_simulator_SETUP_PY_SETUP_MODULE "distutils.core")
+set(infant_simulator_SETUP_PY_VERSION "0.0.0")
+set(infant_simulator_SETUP_PY_SCRIPTS "")
+set(infant_simulator_SETUP_PY_PACKAGES "infant_simulator")
+set(infant_simulator_SETUP_PY_PACKAGE_DIRS "src/infant_simulator")
+set(infant_simulator_SETUP_PY_MODULES "")
+set(infant_simulator_SETUP_PY_MODULE_DIRS "")
