@@ -23,6 +23,8 @@ from behavior_tree.belief_behavior_tree import *
 import numpy as np
 import time
 
+from infant_simulator.state import WorldState
+
 
 class State:
     def __init__(self):
@@ -190,6 +192,10 @@ class Robot:
         self.set_robot_start_pos(x, y, theta)
 
         #Set up BT interface
+        self.bt_interface = BT_Interface(self.bt)
+
+    def update_bt(self, bt):
+        self.bt = bt
         self.bt_interface = BT_Interface(self.bt)
 
     def set_robot_start_pos(self, x, y, theta):
@@ -630,18 +636,21 @@ class Controller:
         self.infant = infant
         self.world = world
 
-    def run(self):
+    def run(self, table_yaml, step_size = 900, starting_score = 0, starting_distance = 0):
         """
         Main function where simulation iterations occur. The robot and infant tick
         based on this function
         :return:
         """
+
+        # step_size: runs the sim for only one iteration if = 1
+
         # start_time = rospy.Time.now()
         score = Scorer()
         num_iterations = 0
 
         r = rospy.Rate(1) # 1hz
-        while not rospy.is_shutdown():# and num_iterations < 10:
+        while not rospy.is_shutdown() and num_iterations < step_size:
             #for i in range(10): # test loop, need to use above ros method
             print(' ')
             print("iteration: " + str(num_iterations))
@@ -662,8 +671,15 @@ class Controller:
 
             # print('Infant action: ', infant_action)
             r.sleep()
+
+        final_score = score.score + starting_score
+        final_distance = score.distance + starting_distance
+
+        # Get state from bt statuses
+        state = WorldState(table_yaml)
+        state.update_state(self.robot.bt)
             
-        return score.score, score.distance  
+        return final_score, final_distance, state
 
 
 

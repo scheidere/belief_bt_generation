@@ -22,12 +22,15 @@ from parameters import Parameters as p
 from behavior_tree.belief_behavior_tree import BeliefBehaviorTree
 
 class InfantSimulator:
-    def __init__(self):
+    def __init__(self, bt = None):
         self.num_objects = p.n_objects
         self.world_x = p.x_dim
         self.world_y = p.y_dim
-        path = '/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/move_away.tree'
-        self.bt = self.get_behavior_tree(path)
+        if bt == None:
+            path = '/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/move_away.tree'
+            self.bt = self.get_behavior_tree(path)
+        else:
+            self.bt = bt
         config = 1
 
         # prolly not needed
@@ -42,12 +45,18 @@ class InfantSimulator:
         self.world.robot_create(self.robot)
         self.controller = Controller(self.robot,self.world.inf, self.world)
 
-    def run_sim(self):
-        self.controller.run()
+    def run_sim(self, table_yaml, step, current_score, current_distance):
+        return self.controller.run(table_yaml, step_size = step, starting_score = current_score, starting_distance = current_distance)
 
     def get_behavior_tree(self, path_to_tree_file):
         #return BehaviorTree(path_to_tree_file)
         return BeliefBehaviorTree(path_to_tree_file)
+
+    def update_bt(self, bt):
+        self.bt = bt
+
+        # Updates robot.bt and robot.bt_interface
+        self.robot.update_bt(bt)
 
 
     def generateReward(self, word, max_iterations):

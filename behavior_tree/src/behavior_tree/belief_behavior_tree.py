@@ -37,7 +37,7 @@ ReturnStatus.SUCCESS = ReturnStatus(Status.SUCCESS)
 #================================================================================================================
 
 class Node(object):
-    max_wait_time = 1.0
+    max_wait_time = 1000
     def __init__(self, label):
         self.label = label
         self.children = []
@@ -265,7 +265,7 @@ class Skipper(ControlFlowNode):
     #     else:
     #         return mem
 
-'''
+
 # Can't have parllel nodes with their (BBT) definition of delayed actions
 class Parallel(ControlFlowNode):
     label = '||'
@@ -296,7 +296,7 @@ class Parallel(ControlFlowNode):
                 self.status = ReturnStatus.RUNNING
 
         self.is_active = active
-'''
+
         
 #================================================================================================================
 # ----------------------------------------------- Execution Nodes -----------------------------------------------
@@ -522,12 +522,10 @@ class BeliefBehaviorTree:
         if config_filename != '':
             self.parse_config(config_filename)
 
-        Node.max_wait_time = rospy.get_param('~timeout', 1.0)
+        Node.max_wait_time = 1000 #rospy.get_param('~timeout', 1.0)
 
         self.active_actions_pub = rospy.Publisher('active_actions', String, queue_size=1)
 
-        # Keep track of active actions locally (for splitting function ??? )
-        self.active_actions = ''
 
     def generate_nodes_list(self):
         # This function fills in self.nodes
@@ -738,8 +736,8 @@ class BeliefBehaviorTree:
 
         if node_type == 'Sequence':
             node_label = '->'
-        elif node_type == 'Skipper':
-            node_label = '=>'
+        #elif node_type == 'Skipper':
+        #    node_label = '=>'
         elif node_type == 'Fallback':
             node_label = '?'
         
@@ -771,6 +769,7 @@ class BeliefBehaviorTree:
             # Make sure that if there are more than one of the same action, if any are active, then active should be published
             unique_action_nodes = {}
             for node in self.nodes:
+                print(node.label, node.status.status)
                 if isinstance(node, Action):
                     if node.label not in unique_action_nodes.keys() or node.is_active:
                         #if node.is_active:

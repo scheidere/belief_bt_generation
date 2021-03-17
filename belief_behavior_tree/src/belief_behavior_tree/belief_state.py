@@ -2,7 +2,7 @@
 
 import copy
 
-from infant_simulator.state import State
+from infant_simulator.state import WorldState as State
 
 
 class BeliefState:

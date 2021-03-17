@@ -2,8 +2,7 @@
 
 import numpy as np
 
-
-class State:
+class WorldState:
     def __init__(self, table_yaml, DEBUG = False):
 
         # Inputs will be pulled from yaml elsewhere, 
@@ -16,6 +15,8 @@ class State:
         self.DEBUG = DEBUG
 
         self.initStateDict()
+
+        print("INITIALIZING STATE")
 
 
     def initStateDict(self):
@@ -38,3 +39,22 @@ class State:
                 print(status_list[i])
             self.state[condition_string_list[i]] = status_list[i]
 
+
+    def update_state(self, bt):
+
+        for node in bt.nodes:
+            print(node.label, node.status.status)
+
+            if node.label in self.state.keys():
+                if node.status.status == 0: # failure
+                    status = 'F'
+                elif node.status.status == 1:
+                    status = 'R'
+                elif node.status.status == 2:
+                    status = 'S'
+                else:
+                    print('____________NODE STATUS ERROR____________')
+
+                self.state[node.label] = status
+
+            #if isinstance(node, Condition):

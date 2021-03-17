@@ -398,9 +398,9 @@ if __name__ == "__main__":
 
     #generate_resolution_subtree()
 
-    resolution_action, resolution_precondition_string_list = find_resolution_action('child_moving_toward',init_belief_state.action_table_list)
-    print(resolution_action)
-    print(resolution_precondition_string_list)
+    #resolution_action, resolution_precondition_string_list = find_resolution_action('child_moving_toward',init_belief_state.action_table_list)
+    #print(resolution_action)
+   #print(resolution_precondition_string_list)
 
     '''
     bt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
