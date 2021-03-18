@@ -4,32 +4,24 @@
 		?
 			->
 				(child_moving_toward)
-				[sounds]
 				[bubbles]
 			->
 				(child_moving_away)
-				[move_toward]
-				[sounds]
 				[bubbles]
 			->
 				(child_stationary)
-				[move_toward]
+				[bubbles]
 	->
 		(social_interaction)
 		?
 			->
 				(child_moving_toward)
-				[move_away]
-				[lights]
+				[bubbles]
 			->
 				(child_moving_away)
-				[lights]
-				[move_away]
-				[sounds]
+				[bubbles]
 			->
 				(child_stationary)
-				[idle]
-				[lights]
 				[bubbles]
 
 	->
@@ -37,14 +29,10 @@
 		?
 			->
 				(child_moving_toward)
-				[lights]
-				[move_toward]
+				[bubbles]
 			->
 				(child_moving_away)
 				[bubbles]
-				[move_toward]
 			->
 				(child_stationary)
-				[move_toward]
-				[sounds]
-				[lights]
+				[bubbles]

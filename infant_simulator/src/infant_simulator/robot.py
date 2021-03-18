@@ -245,6 +245,7 @@ class Robot:
         # for node in self.bt.nodes:
         #     print(node.label, node.status.status)
 
+        self.condition_updates()  # Conditions: Success or Failure
         # print("++++++++++++++++++++++")
 
         active_actions = self.bt_interface.getActiveActions()
@@ -273,7 +274,6 @@ class Robot:
         self.lights(self.known_world)
         self.sounds(self.known_world)
 
-        self.condition_updates()  # Conditions: Success or Failure
         
         self.set_action_status() #??? # Actions: Success, Failure, or Running
 
@@ -635,27 +635,36 @@ class Controller:
         num_iterations = 0
 
         r = rospy.Rate(1) # 1hz
+        # self.world.infant_pos_update()
+        # self.world.robot_pos_update()
+        # self.world.world_plot(num_iterations)
+        # num_iterations += 1
+        # r.sleep()
+
         while not rospy.is_shutdown() and num_iterations < 900:
             #for i in range(10): # test loop, need to use above ros method
             #print(' ')
             #print("iteration: " + str(num_iterations))
-            self.world.infant_pos_update()
-            self.world.robot_pos_update()
-            # self.world.world_plot(num_iterations)
+
+
             # active_actions = self.robot.do_random()
             active_actions = self.robot.do_iteration()
-            #print(active_actions)
+            # print("Active: ", active_actions, " Iterations: ", num_iterations)
 
             #print("Active ids: ", self.robot.bt.active_ids)
 
-            num_iterations += 1
-            
+
             # if random number > 10:
                 # we decided to do something different
             infant_action = self.infant.infant_step(self.robot.robot_pos, active_actions, self.world.centers)
             score.infant_sim_reward(infant_action, self.robot.state.infant2robot_dist(self.world))
 
+            self.world.infant_pos_update()
+            self.world.robot_pos_update()
+            # self.world.world_plot(num_iterations)
             # print('Infant action: ', infant_action)
+            num_iterations += 1
+            
             #r.sleep()
             
         return score.score, score.distance  

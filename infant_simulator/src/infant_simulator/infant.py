@@ -187,7 +187,7 @@ class Infant:
         
         return collision
 
-    def infant_step(self, robot_pos, agent_action, wld_centers):
+    def infant_step(self, robot_pos, active_actions, wld_centers):
         """
         infant takes an action
         1 is infant moves towards the robot
@@ -202,11 +202,11 @@ class Infant:
         dist_cat = self.infant2robot_dist(robot_pos) 
         # e.g.: if robot action = bubbles, infant does action with X% probability
         try:
-            robot_action = p.agent_actions[active_actions[-1]]
+            robot_action = p.agent_actions[active_actions[0]]
         except:
             robot_action = p.agent_actions['idle'] 
         action_prob = self.inf_table[dist_cat, robot_action]
-        # print("probability of response by infant: ", action_prob) 
+        # print("robot action", robot_action) 
 
         # IF YOU WANT CHILD TO ALWAYS MOVE TOWARD (for testing): Set check_val to lesser value than action_prob
         # check_val = 1
@@ -294,9 +294,10 @@ class Infant:
         #         self.infant_pos = [x_new, y_new, theta_new]
 
         # failure, child either moves away or stays still
-        elif check_val >= 0.5:
+        elif ((1 - action_prob)/2 + action_prob) > check_val: #  >= action_prob + 0.1:
             # move away
             self.inf_action = 2
+            # print("Moving away cuz im a butt")
             if (self.infant_pos[0] == robot_pos[0]) or (self.infant_pos[1] == robot_pos[1]):
             # lie along one of the parallels
                 if self.infant_pos[0] == robot_pos[0]:
@@ -333,6 +334,7 @@ class Infant:
             self.infant_pos = [x_new, y_new, theta_new]
 
         else:
+            # print("Stationary yo")
             # stationary
             self.inf_action = 4
 
