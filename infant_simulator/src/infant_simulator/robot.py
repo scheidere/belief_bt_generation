@@ -32,9 +32,9 @@ class State:
         # initialized values for conditions (infant distances)
         self.euclidean_diff = 0  # euclidean distance between robot and infant.
         self.euclidean_diff_cat = 2  # Range the infant is away from robot (3 ranges). infant starts nearby the robot
-        self.inf_close = 1 #0.3048  # 1 ft
+        self.inf_close = 0.3048  # 1 ft
         self.one_ft = self.inf_close
-        self.inf_near = 3#0.9144  # 3 ft
+        self.inf_near = 0.9144  # 3 ft
         self.three_ft = self.inf_near
         self.diff_old2new = 0
 
@@ -679,7 +679,10 @@ class Controller:
             print("iteration: " + str(num_iterations))
             self.world.infant_pos_update()
             self.world.robot_pos_update()
-            self.world.world_plot()
+
+            # UNCOMMENT TO SHOW PLOT
+            #self.world.world_plot()
+            
             active_actions, state = self.robot.do_iteration(table_yaml)
             print(active_actions)
 
@@ -693,7 +696,7 @@ class Controller:
             score.infant_sim_reward(infant_action, self.robot.state.infant2robot_dist(self.world))
 
             # print('Infant action: ', infant_action)
-            r.sleep()
+            #r.sleep()
 
         final_score = score.score + starting_score
         final_distance = score.distance + starting_distance

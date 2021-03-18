@@ -196,7 +196,7 @@ class Sequence(ControlFlowNode):
         mem = self.children[from_num].tick_mem(mem)
 
         # Split mem by success vs no success (failure, running)
-        mem_given_success, mem_given_no_success = mem.split_by_return_status(r = 'S')#ReturnStatus.SUCCESS)
+        mem_given_success, mem_given_no_success = mem.split_by_return_status(return_status = 'S')#ReturnStatus.SUCCESS)
 
         return combine(mem_given_no_success, self.tick_mem(mem_given_success, from_num = from_num + 1))
 
@@ -240,7 +240,7 @@ class Skipper(ControlFlowNode):
         mem = self.children[from_num].tick_mem(mem)
 
         # Split mem by running vs not running (failure, success)
-        mem_given_running, mem_given_no_running = mem.split_by_return_status(r = 'R')#ReturnStatus.RUNNING)
+        mem_given_running, mem_given_no_running = mem.split_by_return_status(return_status = 'R')#ReturnStatus.RUNNING)
 
         return combine(mem_given_no_running, self.tick_mem(mem_given_running, from_num = from_num + 1))
 

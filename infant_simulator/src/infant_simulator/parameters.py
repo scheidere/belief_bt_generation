@@ -14,15 +14,15 @@ class Parameters:
     sensor_resolution = 360
     detection_radius = 3.5  # Meters
     agent_rad = 0.274  # Radius of turtlebot in m (used for size estimations and collision detection)
-    infant_rad = 0.274
     max_vel = 0.2  # m/s
     max_rot_vel = 0.75  # rad / s
     buff = 0.01  # If the agent gets closer than this, consider it a collision
     bubble_cap = 10
 
     # infant parameters
+    infant_rad = 0.25
     inf_gravity = 0.9 # if randomly higher than this value (so 10% of the time), then infant moves towards another toy instead
-    inf_vel = 0.5 # m/s
+    inf_vel = 0.2 # m/s
 
     # World Parameters
     x_dim = 6

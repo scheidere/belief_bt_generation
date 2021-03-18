@@ -81,48 +81,77 @@ def yaml_test():
 if __name__ == '__main__':
     #yaml_test()
 
-    num_iterations = 0 # need to stop at 900
-    step_size = 1 # Only run each bt one iteration in the world before reevaluating
-    goal_prob = 0.9 # We may need to disable this because we aren't stopping once the goal condition is reached
-    current_score = 0
-    current_distance = 0
+    final_scores = [] # scores
+    final_distances = [] # average distances
 
-    do_not_reuse_action_row_nums = []
+    num_runs = 10
+    for i in range(num_runs):
+
+        num_iterations = 0 # need to stop at 900
+        step_size = 1 # Only run each bt one iteration in the world before reevaluating
+        goal_prob = 0.9 # We may need to disable this because we aren't stopping once the goal condition is reached
+        current_score = 0
+        current_distance = 0
+
+        total_iterations = 100
+
+        do_not_reuse_action_row_nums = []
 
 
-    table_yaml = get_table_yaml()
-    #print('yaml', len(table_yaml))
+        table_yaml = get_table_yaml()
+        #print('yaml', len(table_yaml))
 
-    # Get initial bbt/bt
-    #bbt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
-    bbt = BeliefBehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
-    #bbt = get from bbt method
+        # Get initial bbt/bt
+        #bbt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
+        bbt = BeliefBehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
+        #bbt = get from bbt method
 
-    rospy.init_node('infant_simulator')
-    pub = rospy.Publisher('state', String, queue_size=10)
-    sim = InfantSimulator(bt = bbt)
+        rospy.init_node('infant_simulator')
+        pub = rospy.Publisher('state', String, queue_size=10)
+        sim = InfantSimulator(bt = bbt)
 
-    while not rospy.is_shutdown() and num_iterations < 100:
-        #rospy.sleep(1)
-        print('BT node list: ', sim.bt.nodes)
+        pub2 = rospy.Publisher('iteration', String, queue_size=10)
 
-        #print('===== RUNNING SIMULATOR =====')
-        pub.publish('Running sim')
-        current_score, current_distance, state = sim.run_sim(table_yaml, step_size, current_score, current_distance) #calls controller.run()
 
-        # Current belief state is physical state with prob 1 (Really this simple...???)
-        current_belief_state = BeliefState([state], [1], table_yaml) # in future this should be more complex
-        print("Belief state: ", current_belief_state.belief)
-        print('State in belief state: ', current_belief_state.belief[0][1].state)
+        while not rospy.is_shutdown() and num_iterations < total_iterations:
+            #rospy.sleep(1)
 
-        #update bt using bbt method
-        pub.publish('Running expansion')
-        bbt, do_not_reuse_action_row_nums = refine_tree(bbt, goal_prob, current_belief_state, table_yaml, do_not_reuse_action_row_nums)
+            pub2.publish(str(num_iterations))
 
-        sim.update_bt(bbt)
-    
-        num_iterations +=1
+            print('BT node list: ', sim.bt.nodes)
 
+            #print('===== RUNNING SIMULATOR =====')
+            pub.publish('Running sim')
+            current_score, current_distance, state = sim.run_sim(table_yaml, step_size, current_score, current_distance) #calls controller.run()
+
+            # Current belief state is physical state with prob 1 (Really this simple...???)
+            current_belief_state = BeliefState([state], [1], table_yaml) # in future this should be more complex
+            print("Belief state: ", current_belief_state.belief)
+            print('State in belief state: ', current_belief_state.belief[0][1].state)
+
+            #update bt using bbt method
+            pub.publish('Running expansion')
+            bbt, do_not_reuse_action_row_nums = refine_tree(bbt, goal_prob, current_belief_state, table_yaml, do_not_reuse_action_row_nums)
+
+            sim.update_bt(bbt)
+        
+            num_iterations +=1
+
+
+        final_scores.append(current_score)
+        final_distances.append(current_distance/total_iterations)
+
+
+        #print('Results for ' + str(total_iterations) + ' iterations: ')
+        #print('Final score: ' + str(current_score))
+        #print('Final dist: ' + str(current_distance/total_iterations))
+
+
+    print('Results for ' + str(num_runs) + ' ' + str(total_iterations) + '-iteration runs: ')
+    print('Final average score: ' + str(np.mean(final_scores)))
+    print(final_scores)
+    print('Final average average distance: ' + str(np.mean(final_distances)))
+    print(final_distances)
 
 
 

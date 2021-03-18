@@ -264,7 +264,7 @@ def traverse_and_replace(root, condition_to_resolve_string, resolution_subtree):
             if node.label == condition_to_resolve_string:
                 root.children[i] = resolution_subtree
                 break
-                
+
             else:
                 traverse_and_replace(node,condition_to_resolve_string, resolution_subtree)
                 
@@ -371,7 +371,10 @@ def generate_resolution_subtree(condition_to_resolve_string, resolution_action_s
     root = Fallback()
     condition_to_resolve = Condition(condition_to_resolve_string)
     root.children.append(condition_to_resolve)
-    root.children.append(Fallback())
+    
+    # IS THIS RIGHT? SEQUENCE OR FALLBACK?
+    #root.children.append(Fallback())
+    root.children.append(Sequence())
 
     # Add chilren to fallback
     # First preconditions

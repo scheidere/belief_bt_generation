@@ -187,7 +187,7 @@ class Infant:
         
         return collision
 
-    def infant_step(self, robot_pos, agent_action, wld_centers):
+    def infant_step(self, robot_pos, active_actions, wld_centers):
         """
         infant takes an action
         1 is infant moves towards the robot
@@ -253,48 +253,50 @@ class Infant:
             #self.infant_pos = [x_new, y_new, theta_new]
             #return True
 
-        elif check_val >= self.inf_grav:   
-                # gravity movement towards an object
-                self.inf_action = 3
-                # find the closest object and let the infant move towards it
-                closest_obj = self.inf_obj_dist(wld_centers)
-                if (self.infant_pos[0] == wld_centers[closest_obj][0]) or (self.infant_pos[1] == wld_centers[closest_obj][1]):
-                # lie along one of the parallels
-                    if self.infant_pos[0] == wld_centers[closest_obj][0]:
-                        # lie along x, check which y is bigger for direction
-                        if self.infant_pos[1] > wld_centers[closest_obj][1]:
-                            theta_new = np.pi/2
-                        else:
-                            theta_new = 3*np.pi/2
-                    else:
-                        if self.infant_pos[0] > wld_centers[closest_obj][0]:
-                            theta_new = np.pi
-                        else:
-                            theta_new = 0
-                if (self.infant_pos[0] < wld_centers[closest_obj][0]) and (self.infant_pos[1] < wld_centers[closest_obj][1]):
-                    # top right quadrant movement
-                    theta_new = np.random.uniform(0, np.pi/2)
-                elif (self.infant_pos[0] > wld_centers[closest_obj][0]) and (self.infant_pos[1] < wld_centers[closest_obj][1]):
-                    # top left quadrant movement
-                    theta_new = np.random.uniform(np.pi/2,np.pi)
-                elif (self.infant_pos[0] < wld_centers[closest_obj][0]) and (self.infant_pos[1] > wld_centers[closest_obj][1]):
-                    # bottom right quadrant movement
-                    theta_new = np.random.uniform((3*np.pi)/2, 2*np.pi)
-                else:
-                    # bottom left quadrant movement
-                    theta_new = np.random.uniform(np.pi, 3*np.pi/2)
-                # move it!
-                x_new = self.infant_pos[0] + self.inf_vel * time_step * cos(theta_new)
-                y_new = self.infant_pos[1] + self.inf_vel * time_step * sin(theta_new)
-                self.infant_pos_old = self.infant_pos
-                illegal = self.collision_detection(x_new, y_new, p.x_dim, p.y_dim) # Emily addition to prevent leaving map
-                if not illegal: # Emily addition to prevent leaving map
-                    self.infant_pos = [x_new, y_new, theta_new]
-                    return False
-                #self.infant_pos = [x_new, y_new, theta_new]
+        # COMMENTED OUT BECAUSE WE HAVE NO OBSTACLES TO PULL THE INFANT TOWARD
+        # elif check_val >= self.inf_grav:   
+        #         # gravity movement towards an object
+        #         self.inf_action = 3
+        #         # find the closest object and let the infant move towards it
+        #         closest_obj = self.inf_obj_dist(wld_centers)
+        #         if (self.infant_pos[0] == wld_centers[closest_obj][0]) or (self.infant_pos[1] == wld_centers[closest_obj][1]):
+        #         # lie along one of the parallels
+        #             if self.infant_pos[0] == wld_centers[closest_obj][0]:
+        #                 # lie along x, check which y is bigger for direction
+        #                 if self.infant_pos[1] > wld_centers[closest_obj][1]:
+        #                     theta_new = np.pi/2
+        #                 else:
+        #                     theta_new = 3*np.pi/2
+        #             else:
+        #                 if self.infant_pos[0] > wld_centers[closest_obj][0]:
+        #                     theta_new = np.pi
+        #                 else:
+        #                     theta_new = 0
+        #         if (self.infant_pos[0] < wld_centers[closest_obj][0]) and (self.infant_pos[1] < wld_centers[closest_obj][1]):
+        #             # top right quadrant movement
+        #             theta_new = np.random.uniform(0, np.pi/2)
+        #         elif (self.infant_pos[0] > wld_centers[closest_obj][0]) and (self.infant_pos[1] < wld_centers[closest_obj][1]):
+        #             # top left quadrant movement
+        #             theta_new = np.random.uniform(np.pi/2,np.pi)
+        #         elif (self.infant_pos[0] < wld_centers[closest_obj][0]) and (self.infant_pos[1] > wld_centers[closest_obj][1]):
+        #             # bottom right quadrant movement
+        #             theta_new = np.random.uniform((3*np.pi)/2, 2*np.pi)
+        #         else:
+        #             # bottom left quadrant movement
+        #             theta_new = np.random.uniform(np.pi, 3*np.pi/2)
+        #         # move it!
+        #         x_new = self.infant_pos[0] + self.inf_vel * time_step * cos(theta_new)
+        #         y_new = self.infant_pos[1] + self.inf_vel * time_step * sin(theta_new)
+        #         self.infant_pos_old = self.infant_pos
+        #         illegal = self.collision_detection(x_new, y_new, p.x_dim, p.y_dim) # Emily addition to prevent leaving map
+        #         if not illegal: # Emily addition to prevent leaving map
+        #             self.infant_pos = [x_new, y_new, theta_new]
+        #             return False
+        #         #self.infant_pos = [x_new, y_new, theta_new]
 
         # failure, child either moves away or stays still
-        elif check_val >= 0.5:
+        #elif check_val >= 0.5:
+        elif ((1 - action_prob)/2 + action_prob) > check_val: # >= action_prob + 0.1: 
             # move away
             self.inf_action = 2
             if (self.infant_pos[0] == robot_pos[0]) or (self.infant_pos[1] == robot_pos[1]):
