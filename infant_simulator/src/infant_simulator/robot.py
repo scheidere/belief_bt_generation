@@ -23,7 +23,7 @@ from behavior_tree.belief_behavior_tree import *
 import numpy as np
 import time
 
-from infant_simulator.state import WorldState
+from behavior_tree.state import WorldState
 
 
 class State:
@@ -32,9 +32,9 @@ class State:
         # initialized values for conditions (infant distances)
         self.euclidean_diff = 0  # euclidean distance between robot and infant.
         self.euclidean_diff_cat = 2  # Range the infant is away from robot (3 ranges). infant starts nearby the robot
-        self.inf_close = 0.3048  # 1 ft
+        self.inf_close = 1 #0.3048  # 1 ft
         self.one_ft = self.inf_close
-        self.inf_near = 0.9144  # 3 ft
+        self.inf_near = 3#0.9144  # 3 ft
         self.three_ft = self.inf_near
         self.diff_old2new = 0
 
@@ -287,6 +287,8 @@ class Robot:
         state = self.condition_updates(table_yaml)  # Conditions: Success or Failure
         
         self.set_action_status() #??? # Actions: Success, Failure, or Running
+
+        self.bt_interface.tick_bt() # tick again to update
 
         #self.move_away(self.known_world)
         #action = self.spin()
@@ -670,7 +672,7 @@ class Controller:
         score = Scorer()
         num_iterations = 0
 
-        r = rospy.Rate(1) # 1hz
+        r = rospy.Rate(10) # 1hz if 1
         while not rospy.is_shutdown() and num_iterations < step_size:
             #for i in range(10): # test loop, need to use above ros method
             print(' ')

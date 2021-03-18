@@ -2,9 +2,9 @@
 
 import yaml
 import copy
-from infant_simulator.state import WorldState as State
+from behavior_tree.state import WorldState as State
 #from world_simulator.state import State
-from belief_state import BeliefState, combine
+from behavior_tree.belief_state import BeliefState, combine
 from behavior_tree.behavior_tree import * #BehaviorTree, Sequence, ControlFlowNode
 from refine_tree import *
 
@@ -380,7 +380,7 @@ if __name__ == "__main__":
     # init_state.updateState(['occluded','social_interaction'],['F','S'])
     # print(init_state.state)
 
-    #####init_belief_state = general_belief_state_test(init_state, table_yaml)
+    init_belief_state = general_belief_state_test(init_state, table_yaml)
     # print('before', init_belief_state.belief)
 
     # after_action_belief_state = init_belief_state.apply_action_belief_state('move_toward')
@@ -398,9 +398,9 @@ if __name__ == "__main__":
 
     #generate_resolution_subtree()
 
-    #resolution_action, resolution_precondition_string_list = find_resolution_action('child_moving_toward',init_belief_state.action_table_list)
-    #print(resolution_action)
-   #print(resolution_precondition_string_list)
+    resolution_action, resolution_precondition_string_list = find_resolution_action('child_moving_toward',init_belief_state.action_table_list)
+    print('resolution action', resolution_action)
+    print('resolution_precondition_string_list', resolution_precondition_string_list)
 
     '''
     bt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')

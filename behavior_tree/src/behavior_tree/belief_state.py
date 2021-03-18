@@ -2,7 +2,7 @@
 
 import copy
 
-from infant_simulator.state import WorldState as State
+from state import WorldState as State
 
 
 class BeliefState:
@@ -49,7 +49,7 @@ class BeliefState:
             #subset = (prob, state)
             # actions denotes the active actions in the given state, will be search to determine if any are delayed i.e. RUNNING ???
             #subset = (prob, state, actions)
-            subset = (prob, state, return_status)
+            subset = [prob, state, return_status] # originally was a tuple, but they are immutable
 
             self.belief.append(subset)
 
@@ -352,7 +352,7 @@ class BeliefState:
         belief_state.belief = []
 
 
-        for i in range(len(self.belief)):
+        for i in range(len(self.belief)-1): # Added -1 since .pop(i) was giving an error
             if check_goal_condition:
                 status = self.get_goal_conditions_status(self.belief[i][1], goal_conditions_list)
             else:
@@ -454,6 +454,8 @@ class BeliefState:
         goal_reached_prob_sum = 0
         count = 0
 
+        print('BELIEF in prob goal reached', self.belief)
+
         for state_info_tuple in self.belief:
 
             # Check if goal reached
@@ -463,10 +465,12 @@ class BeliefState:
 
 
         # single prob combining all state probs in belief state in which the goal has been reached
-        return goal_reached_prob_sum/count 
+        if count:
+            return goal_reached_prob_sum/count 
+        return 0 # If self.belief empty, no states were at goal so 0 prob of being at goal
 
 
-def combine (mem_1, mem_2, table_yaml, DEBUG = False):
+def combine (mem_1, mem_2, DEBUG = False):
 
     '''
     Combines two belief states.
@@ -483,6 +487,8 @@ def combine (mem_1, mem_2, table_yaml, DEBUG = False):
     DO WE NEED TO DEAL WITH NORMALIZATION? Like when a split mem gets added to results in self_simulate
 
     '''
+
+    table_yaml  = mem_1.table_yaml
 
     # Check if they are already the same
     if mem_1.__eq__(mem_2):
@@ -525,7 +531,9 @@ def combine (mem_1, mem_2, table_yaml, DEBUG = False):
                 new_prob = state_info_tuple_1[0] + state_info_tuple_2[0]
 
                 # Create the new tuple for that state
-                new_state_info_tuple = (new_prob, state_1[0], state_1[1])
+                #[new_prob, state_1[0], state_1[1]]
+                new_state_info_tuple = [new_prob, state_info_tuple_1[1], state_info_tuple_1[2]] # NOW, A LIST... AMAZING
+                print('COMBINING... new state info list', new_state_info_tuple)
 
                 # Add state found in both mems to new mem with updated prob
                 new_mem.belief.append(new_state_info_tuple)

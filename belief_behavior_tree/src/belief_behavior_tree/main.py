@@ -5,8 +5,8 @@ import copy
 #from infant_simulator.state import WorldState
 from infant_simulator.run_simulator import *
 #from world_simulator.state import State
-from belief_state import BeliefState, combine
-from behavior_tree.behavior_tree import * #BehaviorTree, Sequence, ControlFlowNode
+from behavior_tree.belief_state import BeliefState, combine
+#from behavior_tree.behavior_tree import * #BehaviorTree, Sequence, ControlFlowNode
 from refine_tree import *
 from behavior_tree.belief_behavior_tree import *
 
@@ -87,6 +87,9 @@ if __name__ == '__main__':
     current_score = 0
     current_distance = 0
 
+    do_not_reuse_action_row_nums = []
+
+
     table_yaml = get_table_yaml()
     #print('yaml', len(table_yaml))
 
@@ -96,20 +99,25 @@ if __name__ == '__main__':
     #bbt = get from bbt method
 
     rospy.init_node('infant_simulator')
+    pub = rospy.Publisher('state', String, queue_size=10)
     sim = InfantSimulator(bt = bbt)
 
-    while not rospy.is_shutdown() and num_iterations < 1:
+    while not rospy.is_shutdown() and num_iterations < 100:
+        #rospy.sleep(1)
         print('BT node list: ', sim.bt.nodes)
 
+        #print('===== RUNNING SIMULATOR =====')
+        pub.publish('Running sim')
         current_score, current_distance, state = sim.run_sim(table_yaml, step_size, current_score, current_distance) #calls controller.run()
 
         # Current belief state is physical state with prob 1 (Really this simple...???)
-        current_belief_state = BeliefState([state], [1], table_yaml)
+        current_belief_state = BeliefState([state], [1], table_yaml) # in future this should be more complex
         print("Belief state: ", current_belief_state.belief)
         print('State in belief state: ', current_belief_state.belief[0][1].state)
 
         #update bt using bbt method
-        bbt = refine_tree(bbt, goal_prob, current_belief_state)
+        pub.publish('Running expansion')
+        bbt, do_not_reuse_action_row_nums = refine_tree(bbt, goal_prob, current_belief_state, table_yaml, do_not_reuse_action_row_nums)
 
         sim.update_bt(bbt)
     

@@ -17,6 +17,7 @@ class Infant:
         #self.inf_near = 0.9144 # 3 ft
         self.one_ft = 0.3048 # 1 ft
         self.three_ft = 0.9144 # 3 ft
+        self.body_radius = p.infant_rad
         self.dist_cat = 2 # distance category, starts at close
         self.dist = 0 # distance of infant to robot
         self.inf_vel = p.inf_vel
@@ -169,7 +170,7 @@ class Infant:
             return False
             
 
-    def collision_detection(self, wld_obj, x_new, y_new, world_x, world_y):
+    def collision_detection(self, x_new, y_new, world_x, world_y):
         """
         This function is called every time step to detect if the agent has run into anything
         Calculates in C-space
@@ -244,13 +245,13 @@ class Infant:
             x_new = self.infant_pos[0] + self.inf_vel * time_step * cos(theta_new)
             y_new = self.infant_pos[1] + self.inf_vel * time_step * sin(theta_new)
             self.infant_pos_old = self.infant_pos
-            # illegal = self.collision_detection(x_new, y_new, world_space.world_x, world_space.world_y) # Emily addition to prevent leaving map
-            # if not illegal: # Emily addition to prevent leaving map
-            #     self.infant_pos = [x_new, y_new, theta_new]
-            #     # infant moved towards the robot so return True
-            #     return True
-            self.infant_pos = [x_new, y_new, theta_new]
-            return True
+            illegal = self.collision_detection(x_new, y_new, p.x_dim, p.y_dim) # Emily addition to prevent leaving map
+            if not illegal: # Emily addition to prevent leaving map
+                self.infant_pos = [x_new, y_new, theta_new]
+                # infant moved towards the robot so return True
+                return True
+            #self.infant_pos = [x_new, y_new, theta_new]
+            #return True
 
         elif check_val >= self.inf_grav:   
                 # gravity movement towards an object
@@ -286,11 +287,11 @@ class Infant:
                 x_new = self.infant_pos[0] + self.inf_vel * time_step * cos(theta_new)
                 y_new = self.infant_pos[1] + self.inf_vel * time_step * sin(theta_new)
                 self.infant_pos_old = self.infant_pos
-                # illegal = self.collision_detection(x_new, y_new, world_space.world_x, world_space.world_y) # Emily addition to prevent leaving map
-                # if not illegal: # Emily addition to prevent leaving map
-                #     self.infant_pos = [x_new, y_new, theta_new]
-                #     return False
-                self.infant_pos = [x_new, y_new, theta_new]
+                illegal = self.collision_detection(x_new, y_new, p.x_dim, p.y_dim) # Emily addition to prevent leaving map
+                if not illegal: # Emily addition to prevent leaving map
+                    self.infant_pos = [x_new, y_new, theta_new]
+                    return False
+                #self.infant_pos = [x_new, y_new, theta_new]
 
         # failure, child either moves away or stays still
         elif check_val >= 0.5:
@@ -325,11 +326,11 @@ class Infant:
             x_new = self.infant_pos[0] + self.inf_vel * time_step * cos(theta_new)
             y_new = self.infant_pos[1] + self.inf_vel * time_step * sin(theta_new)
             self.infant_pos_old = self.infant_pos
-            # illegal = self.collision_detection(x_new, y_new, world_space.world_x, world_space.world_y) # Emily addition to prevent leaving map
-            # if not illegal: # Emily addition to prevent leaving map
-            #     self.infant_pos = [x_new, y_new, theta_new]
-            #     return False
-            self.infant_pos = [x_new, y_new, theta_new]
+            illegal = self.collision_detection(x_new, y_new, p.x_dim, p.y_dim) # Emily addition to prevent leaving map
+            if not illegal: # Emily addition to prevent leaving map
+                self.infant_pos = [x_new, y_new, theta_new]
+                return False
+            #self.infant_pos = [x_new, y_new, theta_new]
 
         else:
             # stationary

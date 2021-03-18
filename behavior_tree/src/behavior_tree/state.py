@@ -18,6 +18,18 @@ class WorldState:
 
         print("INITIALIZING STATE")
 
+    def __eq__(self, other_state):
+
+        # Need to access state variable in state object 
+        # Can't just compare instances 
+
+        # First confirm the other_state input is an instance of state class
+        if not isinstance(other_state, WorldState):
+            # Don't compared against unrelated types
+            return NotImplemented
+
+        return self.state == other_state.state
+
 
     def initStateDict(self):
 

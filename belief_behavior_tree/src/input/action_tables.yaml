@@ -11,8 +11,12 @@ action_table:
       postconditions:
         - 0.4:
           - [child_moving_toward, S]
+          - [direct_social_interaction, S]
         - 0.6:
           - [child_moving_toward, F]
+          - [direct_social_interaction, F]
+
+        # this will need to be all four combos later
 
     -
       action: move_toward

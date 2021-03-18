@@ -7,6 +7,8 @@ from behavior_tree_msgs.msg import Status, Active
 import sys
 import rospkg
 
+from belief_state import BeliefState, combine
+
 #================================================================================================================
 # ----------------------------------------------- Return Status  ------------------------------------------------
 #================================================================================================================
@@ -100,10 +102,9 @@ class Fallback(ControlFlowNode):
         mem = self.children[from_num].tick_mem(mem)
 
         # Split mem by failure vs no failure (success, running)
-        mem_given_failure, mem_given_no_failure = mem.split_by_return_status(r = ReturnStatus.FAILURE)
+        mem_given_failure, mem_given_no_failure = mem.split_by_return_status(return_status = 'F') #ReturnStatus.FAILURE)
 
         return combine(mem_given_no_failure, self.tick_mem(mem_given_failure, from_num = from_num + 1))
-
 
 
 
@@ -195,7 +196,7 @@ class Sequence(ControlFlowNode):
         mem = self.children[from_num].tick_mem(mem)
 
         # Split mem by success vs no success (failure, running)
-        mem_given_success, mem_given_no_success = mem.split_by_return_status(r = ReturnStatus.SUCCESS)
+        mem_given_success, mem_given_no_success = mem.split_by_return_status(r = 'S')#ReturnStatus.SUCCESS)
 
         return combine(mem_given_no_success, self.tick_mem(mem_given_success, from_num = from_num + 1))
 
@@ -239,7 +240,7 @@ class Skipper(ControlFlowNode):
         mem = self.children[from_num].tick_mem(mem)
 
         # Split mem by running vs not running (failure, success)
-        mem_given_running, mem_given_no_running = mem.split_by_return_status(r = ReturnStatus.RUNNING)
+        mem_given_running, mem_given_no_running = mem.split_by_return_status(r = 'R')#ReturnStatus.RUNNING)
 
         return combine(mem_given_no_running, self.tick_mem(mem_given_running, from_num = from_num + 1))
 
@@ -363,17 +364,24 @@ class Condition(ExecutionNode):
         # Evaluate condition for each state in given belief state, mem,
         # Update each state with new condition return status
 
+        print('======= Condition tick_mem START =======')
+
         for i in range(len(mem.belief)):
 
             # State is a dict of condition name strings and current return statuses
             state = mem.belief[i][1]
+            print('state', state)
+            print('condition label', self.label)
+            print('belief', mem.belief[i])
 
             # Update state return status to match ticked condition's status in that state
-            return_status = state[self.label]
+            return_status = state.state[self.label]
 
             # Update mem, i.e. state's return status to be the specific condition's return status
             mem.belief[i][2] = return_status
         
+        print('mem', mem)
+        print('======= Condition tick_mem END =======')
         return mem
         
     def get_subscriber_name(self):
@@ -543,9 +551,12 @@ class BeliefBehaviorTree:
         nodes_stack = []
         nodes_stack.append(self.root) #push
 
+        print('root', self.root)
+
         # Do the traversal, using the stack to help
         while len(nodes_stack) != 0:
             current_node = nodes_stack.pop()
+            print('current_node', current_node)
             self.nodes.append(current_node)
             for child_idx in reversed(range(len(current_node.children))):
                 nodes_stack.append(current_node.children[child_idx]) #push
@@ -775,7 +786,10 @@ class BeliefBehaviorTree:
                         #if node.is_active:
                         unique_action_nodes[node.label] = node
                         if node.is_newly_active:
-                            self.active_ids[node.label] += 1
+                            if node.label in self.active_ids.keys():
+                                self.active_ids[node.label] += 1
+                            else:
+                                self.active_ids[node.label] = 1
                     #else:
                     #    unique_action_nodes[node.label] = node
                         
@@ -783,6 +797,8 @@ class BeliefBehaviorTree:
                 #active_msg = Bool()
                 #active_msg.data = node.is_active
                 #node.publisher.publish(active_msg)
+                if not (node.label in self.active_ids.keys()):
+                    self.active_ids[node.label] = 0
                 node.publish_active_msg(self.active_ids[node.label])
 
                 if node.is_active:
@@ -793,7 +809,7 @@ class BeliefBehaviorTree:
     def tick_mem(self, mem): 
         if self.root != None:
             #print('begin tick')
-            self.root.tick_mem(mem, from_num = 0) # changed for BBT
+            mem = self.root.tick_mem(mem, from_num = 0) # changed for BBT
             #print()
 
             ##??? figure out how to track root return status and update each tuple in belief state, i.e. (prob, state, root_return_status)
@@ -811,7 +827,10 @@ class BeliefBehaviorTree:
                         #if node.is_active:
                         unique_action_nodes[node.label] = node
                         if node.is_newly_active:
-                            self.active_ids[node.label] += 1
+                            if node.label in self.active_ids.keys():
+                                self.active_ids[node.label] += 1
+                            else:
+                                self.active_ids[node.label] = 1
                     #else:
                     #    unique_action_nodes[node.label] = node
                         
@@ -819,13 +838,16 @@ class BeliefBehaviorTree:
                 #active_msg = Bool()
                 #active_msg.data = node.is_active
                 #node.publisher.publish(active_msg)
+                if not (node.label in self.active_ids.keys()):
+                    self.active_ids[node.label] = 0
                 node.publish_active_msg(self.active_ids[node.label])
 
                 if node.is_active:
                     active_actions.data += label + ', '
-                    self.active_actions += label + ', ' # added for split function use ???
             active_actions.data = active_actions.data[:-2] # strip the final comma and space
             self.active_actions_pub.publish(active_actions)
+
+        return mem
         
 
     def print_BT(self):
