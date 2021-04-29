@@ -84,7 +84,7 @@ if __name__ == '__main__':
     final_scores = [] # scores
     final_distances = [] # average distances
 
-    num_runs = 10
+    num_runs = 1#10
     for i in range(num_runs):
 
         num_iterations = 0 # need to stop at 900
@@ -93,7 +93,7 @@ if __name__ == '__main__':
         current_score = 0
         current_distance = 0
 
-        total_iterations = 100
+        total_iterations = 3
 
         do_not_reuse_action_row_nums = []
 
