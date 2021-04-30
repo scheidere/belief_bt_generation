@@ -46,7 +46,7 @@ class InfantSimulator:
         self.controller = Controller(self.robot,self.world.inf, self.world)
 
     def run_sim(self, table_yaml, step, current_score, current_distance):
-        return self.controller.run(table_yaml, step_size = step, starting_score = current_score, starting_distance = current_distance)
+        return self.controller.run(table_yaml, step_size = step, starting_score = current_score, starting_distance = current_distance, show_plot=True)
 
     def get_behavior_tree(self, path_to_tree_file):
         #return BehaviorTree(path_to_tree_file)
@@ -91,7 +91,7 @@ class InfantSimulator:
 def test():
     sim = InfantSimulator()
     print('BT node list: ', sim.bt.nodes)
-    sim.run_sim()
+    sim.run_sim() # THIS WILL BREAK, NEED UPDATED ARGS
     # score, target_reported, belief_distance, active_word, active_subtree_indices = sim.generateReward(word, sim_iterations)
 
 

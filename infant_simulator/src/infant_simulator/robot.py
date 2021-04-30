@@ -659,7 +659,7 @@ class Controller:
         self.infant = infant
         self.world = world
 
-    def run(self, table_yaml, step_size = 900, starting_score = 0, starting_distance = 0):
+    def run(self, table_yaml, step_size = 900, starting_score = 0, starting_distance = 0, show_plot = False):
         """
         Main function where simulation iterations occur. The robot and infant tick
         based on this function
@@ -680,8 +680,8 @@ class Controller:
             self.world.infant_pos_update()
             self.world.robot_pos_update()
 
-            # UNCOMMENT TO SHOW PLOT
-            #self.world.world_plot()
+            if show_plot:
+                self.world.world_plot()
             
             active_actions, state = self.robot.do_iteration(table_yaml)
             print(active_actions)

@@ -93,7 +93,7 @@ if __name__ == '__main__':
         current_score = 0
         current_distance = 0
 
-        total_iterations = 3
+        total_iterations = 100
 
         do_not_reuse_action_row_nums = []
 
