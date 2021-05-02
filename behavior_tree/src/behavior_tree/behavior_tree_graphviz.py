@@ -40,7 +40,9 @@ def get_graphviz(tree):
             elif node.status == bt.ReturnStatus.FAILURE:
                 style += 'color=red'
         # style += ' fontsize=15.0'
-        
+        print("things", node)
+        print("other things", node.label)
+        print("nodse", isinstance(node, bt.Fallback))
         if isinstance(node, bt.Condition):
             name = 'condition_%d' % (counts[bt.Condition])
             gv += '\t%s [label="%s" %s]\n' % (name, node.label, style)
@@ -65,7 +67,7 @@ def get_graphviz(tree):
             name = 'decorator_%d' % (counts[bt.Decorator])
             gv += '\t%s [label="%s" shape=diamond %s]\n' % (name, node.label, style)
             counts[bt.Decorator] += 1
-            
+        print("henlo", name)    
         node_names[node] = name
         
         for child in node.children:
