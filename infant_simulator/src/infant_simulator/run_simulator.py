@@ -22,13 +22,14 @@ from parameters import Parameters as p
 # import statistics as stats
 
 from behavior_tree.behavior_tree import BehaviorTree
+import time
 
 class InfantSimulator:
     def __init__(self):
         self.num_objects = p.n_objects
         self.world_x = p.x_dim
         self.world_y = p.y_dim
-        path = '/home/ahelmi/test_inf_sim/src/belief_bt_generation/behavior_tree/config/inf_manual_tree.tree'
+        path = '/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/sequence_test.tree'
         self.bt = self.get_behavior_tree(path)
         config = 1
 
@@ -89,7 +90,8 @@ if __name__ == "__main__":
     total_d = 0
     print('starting simulation')
     rospy.init_node('infant_simulator')
-    for i in range(10):
+    for i in range(1):
+        time.sleep(3)
         av_r, av_d = test()
         total_r += av_r
         total_d += av_d

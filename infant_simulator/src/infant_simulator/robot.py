@@ -653,6 +653,12 @@ class Controller:
 
             #print("Active ids: ", self.robot.bt.active_ids)
 
+            print("Node statuses: ")
+            for node in self.robot.bt.nodes:
+                label = node.label
+                status = node.status.status
+                print(label, status)
+
 
             # if random number > 10:
                 # we decided to do something different
@@ -661,7 +667,7 @@ class Controller:
 
             self.world.infant_pos_update()
             self.world.robot_pos_update()
-            # self.world.world_plot(num_iterations)
+            self.world.world_plot(num_iterations)
             # print('Infant action: ', infant_action)
             num_iterations += 1
             
