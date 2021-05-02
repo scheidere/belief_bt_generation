@@ -17,12 +17,12 @@ class Parameters:
     max_vel = 0.2  # m/s
     max_rot_vel = 0.75  # rad / s
     buff = 0.01  # If the agent gets closer than this, consider it a collision
-    bubble_cap = 10
+    bubble_cap = 10000
 
     # infant parameters
-    infant_rad = 0.25
     inf_gravity = 0.9 # if randomly higher than this value (so 10% of the time), then infant moves towards another toy instead
     inf_vel = 0.2 # m/s
+    infant_rad = 0.25 # radius of child in m (for collision detection)
 
     # World Parameters
     x_dim = 6

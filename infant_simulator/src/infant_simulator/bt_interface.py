@@ -2,14 +2,7 @@
 import yaml
 import rospkg
 import rospy
-
-
-# Passed testing with behavior tree
-#from behavior_tree.behavior_tree import *
-
-# Now testing with belief behavior tree
-from behavior_tree.belief_behavior_tree import *
-
+from behavior_tree.behavior_tree import *
 from behavior_tree_msgs.msg import Status, Active
 
 import behavior_tree.behavior_tree_graphviz as gv
@@ -60,7 +53,7 @@ def getActionsConditions():
     # later can pull directly from table yaml
 
     actions = ['move_toward','move_away','idle','spin','bubbles','lights','sounds']
-    conditions = ['direct_social_interaction','social_interaction','solitary_play','child_moving_toward','child_moving_away','child_stationary'] # 'occluded']
+    conditions = ['direct_social_interaction','social_interaction','solitary_play','child_moving_toward','child_moving_away', 'child_stationary'] # 'occluded']
 
     return actions, conditions
 

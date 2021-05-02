@@ -172,7 +172,7 @@ class Infant:
 
     def collision_detection(self, x_new, y_new, world_x, world_y):
         """
-        This function is called every time step to detect if the agent has run into anything
+        This function is called every time step to detect if the child has run into anything
         Calculates in C-space
         :return: True for collision, false for no collision
         """
@@ -202,11 +202,11 @@ class Infant:
         dist_cat = self.infant2robot_dist(robot_pos) 
         # e.g.: if robot action = bubbles, infant does action with X% probability
         try:
-            robot_action = p.agent_actions[active_actions[-1]]
+            robot_action = p.agent_actions[active_actions[0]]
         except:
             robot_action = p.agent_actions['idle'] 
         action_prob = self.inf_table[dist_cat, robot_action]
-        print("probability of response by infant: ", action_prob) 
+        # print("robot action", robot_action) 
 
         # IF YOU WANT CHILD TO ALWAYS MOVE TOWARD (for testing): Set check_val to lesser value than action_prob
         # check_val = 1
@@ -214,7 +214,7 @@ class Infant:
 
         if check_val <= action_prob:
             # success, infant moves towards robot
-            print("Infant is now moving toward the robot")
+            # print("Infant is now moving toward the robot")
             self.inf_action = 1
             if (self.infant_pos[0] == robot_pos[0]) or (self.infant_pos[1] == robot_pos[1]):
                 # lie along one of the parallels
@@ -250,10 +250,9 @@ class Infant:
                 self.infant_pos = [x_new, y_new, theta_new]
                 # infant moved towards the robot so return True
                 return True
-            #self.infant_pos = [x_new, y_new, theta_new]
-            #return True
+            self.infant_pos = [x_new, y_new, theta_new]
+            return True
 
-        # COMMENTED OUT BECAUSE WE HAVE NO OBSTACLES TO PULL THE INFANT TOWARD
         # elif check_val >= self.inf_grav:   
         #         # gravity movement towards an object
         #         self.inf_action = 3
@@ -292,13 +291,13 @@ class Infant:
         #         if not illegal: # Emily addition to prevent leaving map
         #             self.infant_pos = [x_new, y_new, theta_new]
         #             return False
-        #         #self.infant_pos = [x_new, y_new, theta_new]
+        #         self.infant_pos = [x_new, y_new, theta_new]
 
         # failure, child either moves away or stays still
-        #elif check_val >= 0.5:
-        elif ((1 - action_prob)/2 + action_prob) > check_val: # >= action_prob + 0.1: 
+        elif ((1 - action_prob)/2 + action_prob) > check_val: #  >= action_prob + 0.1:
             # move away
             self.inf_action = 2
+            # print("Moving away cuz im a butt")
             if (self.infant_pos[0] == robot_pos[0]) or (self.infant_pos[1] == robot_pos[1]):
             # lie along one of the parallels
                 if self.infant_pos[0] == robot_pos[0]:
@@ -332,9 +331,10 @@ class Infant:
             if not illegal: # Emily addition to prevent leaving map
                 self.infant_pos = [x_new, y_new, theta_new]
                 return False
-            #self.infant_pos = [x_new, y_new, theta_new]
+            self.infant_pos = [x_new, y_new, theta_new]
 
         else:
+            # print("Stationary yo")
             # stationary
             self.inf_action = 4
 

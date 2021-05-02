@@ -13,17 +13,10 @@ from parameters import Parameters as p
 # import planners
 import random
 from bt_interface import *
-
-# old way
-#from behavior_tree.behavior_tree import *
-
-# new way
-from behavior_tree.belief_behavior_tree import *
+from behavior_tree.behavior_tree import *
 
 import numpy as np
 import time
-
-from behavior_tree.state import WorldState
 
 
 class State:
@@ -142,7 +135,7 @@ class State:
         :return: true is approaching
         """
 
-        print('Checking child_moving_toward')
+        # print('Checking child_moving_toward')
 
         if self.diff_old2new > 0:
             return True
@@ -194,10 +187,6 @@ class Robot:
         #Set up BT interface
         self.bt_interface = BT_Interface(self.bt)
 
-    def update_bt(self, bt):
-        self.bt = bt
-        self.bt_interface = BT_Interface(self.bt)
-
     def set_robot_start_pos(self, x, y, theta):
         """
         Gives the agent a new starting position in the world
@@ -238,7 +227,7 @@ class Robot:
             action = self.idle(self.known_world)
         return active_actions
 
-    def do_iteration(self, table_yaml):
+    def do_iteration(self):
 
         #print('Checking BT node statuses...')
         # for node in self.bt.nodes:
@@ -256,19 +245,20 @@ class Robot:
         # for node in self.bt.nodes:
         #     print(node.label, node.status.status)
 
-        print("++++++++++++++++++++++")
+        self.condition_updates()  # Conditions: Success or Failure
+        # print("++++++++++++++++++++++")
 
         active_actions = self.bt_interface.getActiveActions()
         #print("+++++++++++++++++++++++++active_actions", active_actions)
 
         if 'move_toward' in active_actions:
 
-            print("ACTION EXECUTION: Moving toward!")
+            # print("ACTION EXECUTION: Moving toward!")
             self.move_toward(self.known_world)
 
         if 'move_away' in active_actions:
 
-            print("ACTION EXECUTION: Moving away! Aaaaahhh!")
+            # print("ACTION EXECUTION: Moving away! Aaaaahhh!")
             self.move_away(self.known_world)
 
         #...
@@ -284,20 +274,17 @@ class Robot:
         self.lights(self.known_world)
         self.sounds(self.known_world)
 
-        state = self.condition_updates(table_yaml)  # Conditions: Success or Failure
         
         self.set_action_status() #??? # Actions: Success, Failure, or Running
-
-        self.bt_interface.tick_bt() # tick again to update
 
         #self.move_away(self.known_world)
         #action = self.spin()
 
         # ??? DOES THIS NEED TO BE IN A LOOP. No.
 
-        return active_actions, state
+        return active_actions
 
-    def condition_updates(self, table_yaml):
+    def condition_updates(self):
         """
         Updates all conditions for the bt to observe
         :return:
@@ -317,12 +304,12 @@ class Robot:
         is_moving_away = self.state.child_moving_away(self, self.known_world)
         is_stationary = self.state.child_stationary(self, self.known_world)
 
-        print("Is in dsi? ",is_in_dsi)
-        print("Is in si? ",is_in_dsi)
-        print("Is in sp? ",is_in_sp)
-        print("Is child moving toward? ", is_moving_toward)
-        print("Is child moving away? ", is_moving_away)
-        print("Is child stationary? ", is_stationary)
+        # print("Is in dsi? ",is_in_dsi)
+        # print("Is in si? ",is_in_si)
+        # print("Is in sp? ",is_in_sp)
+        # print("Is child moving toward? ", is_moving_toward)
+        # print("Is child moving away? ", is_moving_away)
+        # print("Is child stationary? ", is_stationary)
 
         # Ensure string is exact condition name
         self.bt_interface.setConditionStatus('direct_social_interaction', is_in_dsi)
@@ -333,26 +320,6 @@ class Robot:
         self.bt_interface.setConditionStatus('child_stationary', is_stationary)
         # self.bt_interface.setConditionStatus('occluded', is_occluded)
         # ... more conditions
-
-        # THIS ORDER MUST MATCH ORDER IN self.bt_interface.conditions list
-        status_list_temp = [is_in_dsi, is_in_dsi, is_in_sp, is_moving_toward, is_moving_away, is_stationary] # True, False form
-        status_list = []
-        for boolean in status_list_temp:
-            if not boolean: # failure
-                status = 'F'
-            # elif node.status.status == 1:
-            #     status = 'R'
-            elif boolean:
-                status = 'S'
-            status_list.append(status)
-
-        # Get state from bt statuses
-        state = WorldState(table_yaml)
-        state.updateState(self.bt_interface.conditions, status_list)
-        #state.update_state(self.bt)
-
-        return state
-
 
     def get_quotient(self, delta_y, delta_x):
 
@@ -371,7 +338,7 @@ class Robot:
 
         #active_actions = self.bt_interface.getActiveActions()
 
-        print("current pos: ", self.robot_pos)
+        # print("current pos: ", self.robot_pos)
 
         world_space.change_robot_plot_color()
 
@@ -428,10 +395,8 @@ class Robot:
         illegal = self.collision_detection(world_space.objects, x_new, y_new, world_space.world_x, world_space.world_y)
         if not illegal:
             self.robot_pos = [x_new, y_new, theta_new]
-            print('new pos: ', self.robot_pos)
+            # print('new pos: ', self.robot_pos)
             return True
-        else:
-            print('Illegal move...')
 
         return False # leaving for when you uncomment illegal stuff
 
@@ -442,7 +407,7 @@ class Robot:
         :return:
         """
 
-        print("current pos: ", self.robot_pos)
+        # print("current pos: ", self.robot_pos)
 
         world_space.change_robot_plot_color()
 
@@ -489,7 +454,7 @@ class Robot:
         illegal = self.collision_detection(world_space.objects, x_new, y_new, world_space.world_x, world_space.world_y)
         if not illegal:
             self.robot_pos = [x_new, y_new, theta_new]
-            print('new pos: ', self.robot_pos)
+            # print('new pos: ', self.robot_pos)
             return True
 
         return False
@@ -506,7 +471,7 @@ class Robot:
 
         if 'bubbles' in active_actions:
 
-            print("ACTION EXECUTION: Blowing bubbles! Ultimate party time!")
+            # print("ACTION EXECUTION: Blowing bubbles! Ultimate party time!")
 
             action = world_space.bubbles()
             world_space.change_robot_plot_color('bubbles')
@@ -524,7 +489,7 @@ class Robot:
 
         if 'idle' in active_actions:
 
-            print("ACTION EXECUTION: Idle, doing nothing! Not party time!")
+            # print("ACTION EXECUTION: Idle, doing nothing! Not party time!")
             world_space.change_robot_plot_color()
             # robot location does not change, just return true this action happened
             return True
@@ -540,12 +505,12 @@ class Robot:
 
         if 'spin' in active_actions:
 
-            print("ACTION EXECUTION: Spinning around! Time to party!")
+            # print("ACTION EXECUTION: Spinning around! Time to party!")
 
             # spin to a random orientation
             theta_new = np.random.uniform(0, 2 * np.pi)
             self.robot_pos = [self.robot_pos[0], self.robot_pos[1], theta_new]
-            world_space.change_robot_plot_color('spin')
+            world_space.change_robot_plot_color()
             return True
 
         return None
@@ -561,7 +526,7 @@ class Robot:
 
         if 'lights' in active_actions:
 
-            print("ACTION EXECUTION: Flashing lights! Time to party!")
+            # print("ACTION EXECUTION: Flashing lights! Time to party!")
             world_space.change_robot_plot_color('lights')
             return True
 
@@ -578,7 +543,7 @@ class Robot:
 
         if 'sounds' in active_actions:
 
-            print("ACTION EXECUTION: Making sound! Time to party!")
+            # print("ACTION EXECUTION: Making sound! Time to party!")
             world_space.change_robot_plot_color('sounds')
             return True
 
@@ -614,12 +579,6 @@ class Robot:
         """
         active_actions = self.bt_interface.getActiveActions()
         # does this mean we are doing an action?
-        
-        # if current_action != active_actions(whichever is active) and timer has exceeded timer (2 seconds for example):
-        #     current_action = active_actions (whichever is active/running?)
-        #     end timer for action
-        #     calculate relative distance change based on timer (send it start and end timer)
-        #     start new_timer for action
 
 
         for action in active_actions:
@@ -659,50 +618,47 @@ class Controller:
         self.infant = infant
         self.world = world
 
-    def run(self, table_yaml, step_size = 900, starting_score = 0, starting_distance = 0):
+    def run(self):
         """
         Main function where simulation iterations occur. The robot and infant tick
         based on this function
         :return:
         """
-
-        # step_size: runs the sim for only one iteration if = 1
-
         # start_time = rospy.Time.now()
         score = Scorer()
         num_iterations = 0
 
-        r = rospy.Rate(10) # 1hz if 1
-        while not rospy.is_shutdown() and num_iterations < step_size:
+        r = rospy.Rate(1) # 1hz
+        # self.world.infant_pos_update()
+        # self.world.robot_pos_update()
+        # self.world.world_plot(num_iterations)
+        # num_iterations += 1
+        # r.sleep()
+
+        while not rospy.is_shutdown() and num_iterations < 900:
             #for i in range(10): # test loop, need to use above ros method
-            print(' ')
-            print("iteration: " + str(num_iterations))
-            self.world.infant_pos_update()
-            self.world.robot_pos_update()
+            #print(' ')
+            #print("iteration: " + str(num_iterations))
 
-            # UNCOMMENT TO SHOW PLOT
-            #self.world.world_plot()
-            
-            active_actions, state = self.robot.do_iteration(table_yaml)
-            print(active_actions)
 
+            # active_actions = self.robot.do_random()
+            active_actions = self.robot.do_iteration()
+            print("Active: ", active_actions, " Iterations: ", num_iterations)
             #print("Active ids: ", self.robot.bt.active_ids)
 
-            num_iterations += 1
-            
-            # if random number > 10:
-                # we decided to do something different
+
             infant_action = self.infant.infant_step(self.robot.robot_pos, active_actions, self.world.centers)
             score.infant_sim_reward(infant_action, self.robot.state.infant2robot_dist(self.world))
 
+            self.world.infant_pos_update()
+            self.world.robot_pos_update()
+            self.world.world_plot(num_iterations)
             # print('Infant action: ', infant_action)
+            num_iterations += 1
+            time.sleep(.1)
             #r.sleep()
-
-        final_score = score.score + starting_score
-        final_distance = score.distance + starting_distance
-
             
-        return final_score, final_distance, state
+        return score.score, score.distance  
 
 
 
