@@ -655,7 +655,7 @@ class Controller:
             self.world.world_plot(num_iterations)
             # print('Infant action: ', infant_action)
             num_iterations += 1
-            time.sleep(.1)
+            time.sleep(1)
             #r.sleep()
             
         return score.score, score.distance  

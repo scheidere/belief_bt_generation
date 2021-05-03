@@ -113,16 +113,18 @@ class World():
         Whole plotter function that includes initializing, updating, and saving the plot.
         :return:
         """
-        plt.ion()
+        # plt.ion()
         # fig = plt.figure(1)
         fig , ax = plt.subplots(1)
         ax.set_xlim([0,self.world_x])
         ax.set_ylim([0,self.world_y])
+        ax.set_yticks([])
+        ax.set_xticks([])
 
-        for i in range(self.num_objects):
-                for k in range(3):
-                    plt.plot((self.objects[i][k][0],self.objects[i][k+1][0]),(self.objects[i][k][1],self.objects[i][k+1][1]),'r')
-                plt.plot((self.objects[i][3][0],self.objects[i][0][0]),(self.objects[i][3][1],self.objects[i][0][1]),'r')
+        # for i in range(self.num_objects):
+        #         for k in range(3):
+        #             plt.plot((self.objects[i][k][0],self.objects[i][k+1][0]),(self.objects[i][k][1],self.objects[i][k+1][1]),'r')
+        #         plt.plot((self.objects[i][3][0],self.objects[i][0][0]),(self.objects[i][3][1],self.objects[i][0][1]),'r')
 
 
         ab = AnnotationBbox(self.getImage(self.robot_path, zoom=self.zoom), [self.robot_pos[0],self.robot_pos[1]], frameon=False)
