@@ -6,10 +6,6 @@
 				(direct_social_interaction)
 				?
 					->
-						(child_moving_toward)
-						[all_rewards]
-
-					->
 						(child_moving_away)
 						[move_toward]
 						[sounds]
@@ -55,6 +51,7 @@
 				?
 					->
 						(child_moving_toward)
+						[idle]
 						[all_rewards]
 
 					->
