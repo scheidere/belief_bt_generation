@@ -165,7 +165,7 @@ class World():
         #     self.iteration_marker.set_text(str(iteration))
         #     fig.canvas.draw()
         #     plt.pause(0.1)
-        # #plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+        ##plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
         plt.savefig("/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(iteration) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
         # # self.iteration_marker
 
