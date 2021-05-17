@@ -681,7 +681,7 @@ class Controller:
             self.world.robot_pos_update()
 
             if show_plot:
-                self.world.world_plot()
+                self.world.world_plot(num_iterations)
             
             active_actions, state = self.robot.do_iteration(table_yaml)
             print(active_actions)

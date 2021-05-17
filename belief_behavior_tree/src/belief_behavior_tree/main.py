@@ -13,7 +13,8 @@ from behavior_tree.belief_behavior_tree import *
 
 def get_table_yaml():
     # Read yaml file
-    with open('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/belief_behavior_tree/src/input/action_tables.yaml', 'r') as stream:
+    #with open('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/belief_behavior_tree/src/input/action_tables.yaml', 'r') as stream:
+    with open('/home/scheidee/belief_ws/src/belief_bt_generation/belief_behavior_tree/src/input/action_tables.yaml', 'r') as stream:        
         try:
             #print(yaml.safe_load(stream))
             table_yaml = yaml.safe_load(stream)
@@ -25,7 +26,8 @@ def get_table_yaml():
 def yaml_test():
 
     # Read yaml file
-    with open('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/belief_behavior_tree/src/input/action_tables.yaml', 'r') as stream:
+    #with open('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/belief_behavior_tree/src/input/action_tables.yaml', 'r') as stream:
+    with open('/home/scheidee/belief_ws/src/belief_bt_generation/belief_behavior_tree/src/input/action_tables.yaml', 'r') as stream:        
         try:
             #print(yaml.safe_load(stream))
             action_yaml = yaml.safe_load(stream)
@@ -103,7 +105,8 @@ if __name__ == '__main__':
 
         # Get initial bbt/bt
         #bbt = BehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
-        bbt = BeliefBehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree')
+        #bbt = BeliefBehaviorTree('/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree') #desktop
+        bbt = BeliefBehaviorTree('/home/scheidee/belief_ws/src/belief_bt_generation/behavior_tree/config/infant_start.tree') #laptop     
         #bbt = get from bbt method
 
         rospy.init_node('infant_simulator')
