@@ -45,8 +45,8 @@ class InfantSimulator:
         self.world.robot_create(self.robot)
         self.controller = Controller(self.robot,self.world.inf, self.world)
 
-    def run_sim(self, table_yaml, step, current_score, current_distance):
-        return self.controller.run(table_yaml, step_size = step, starting_score = current_score, starting_distance = current_distance, show_plot=True)
+    def run_sim(self, table_yaml, step, current_score, current_distance, show_plot = True, doing_fancy_plot = True, actual_iteration = None):
+        return self.controller.run(table_yaml, step_size = step, starting_score = current_score, starting_distance = current_distance, show_plot=show_plot, doing_fancy_plot = doing_fancy_plot, actual_iteration = actual_iteration)
 
     def get_behavior_tree(self, path_to_tree_file):
         #return BehaviorTree(path_to_tree_file)

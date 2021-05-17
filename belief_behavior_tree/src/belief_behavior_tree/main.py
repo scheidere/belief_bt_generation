@@ -95,7 +95,7 @@ if __name__ == '__main__':
         current_score = 0
         current_distance = 0
 
-        total_iterations = 100
+        total_iterations = 120
 
         do_not_reuse_action_row_nums = []
 
@@ -121,11 +121,11 @@ if __name__ == '__main__':
 
             pub2.publish(str(num_iterations))
 
-            print('BT node list: ', sim.bt.nodes)
+            #print('BT node list: ', sim.bt.nodes)
 
             #print('===== RUNNING SIMULATOR =====')
             pub.publish('Running sim')
-            current_score, current_distance, state = sim.run_sim(table_yaml, step_size, current_score, current_distance) #calls controller.run()
+            current_score, current_distance, state = sim.run_sim(table_yaml, step_size, current_score, current_distance, actual_iteration = num_iterations) #calls controller.run()
 
             # Current belief state is physical state with prob 1 (Really this simple...???)
             current_belief_state = BeliefState([state], [1], table_yaml) # in future this should be more complex

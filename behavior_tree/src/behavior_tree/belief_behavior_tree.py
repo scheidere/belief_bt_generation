@@ -364,15 +364,15 @@ class Condition(ExecutionNode):
         # Evaluate condition for each state in given belief state, mem,
         # Update each state with new condition return status
 
-        print('======= Condition tick_mem START =======')
+        #print('======= Condition tick_mem START =======')
 
         for i in range(len(mem.belief)):
 
             # State is a dict of condition name strings and current return statuses
             state = mem.belief[i][1]
-            print('state', state)
-            print('condition label', self.label)
-            print('belief', mem.belief[i])
+            #print('state', state)
+            #print('condition label', self.label)
+            #print('belief', mem.belief[i])
 
             # Update state return status to match ticked condition's status in that state
             return_status = state.state[self.label]
@@ -380,8 +380,8 @@ class Condition(ExecutionNode):
             # Update mem, i.e. state's return status to be the specific condition's return status
             mem.belief[i][2] = return_status
         
-        print('mem', mem)
-        print('======= Condition tick_mem END =======')
+        #print('mem', mem)
+        #print('======= Condition tick_mem END =======')
         return mem
         
     def get_subscriber_name(self):
@@ -551,12 +551,12 @@ class BeliefBehaviorTree:
         nodes_stack = []
         nodes_stack.append(self.root) #push
 
-        print('root', self.root)
+        #print('root', self.root)
 
         # Do the traversal, using the stack to help
         while len(nodes_stack) != 0:
             current_node = nodes_stack.pop()
-            print('current_node', current_node)
+            #print('current_node', current_node)
             self.nodes.append(current_node)
             for child_idx in reversed(range(len(current_node.children))):
                 nodes_stack.append(current_node.children[child_idx]) #push
@@ -780,7 +780,7 @@ class BeliefBehaviorTree:
             # Make sure that if there are more than one of the same action, if any are active, then active should be published
             unique_action_nodes = {}
             for node in self.nodes:
-                print(node.label, node.status.status)
+                #print(node.label, node.status.status)
                 if isinstance(node, Action):
                     if node.label not in unique_action_nodes.keys() or node.is_active:
                         #if node.is_active:

@@ -50,9 +50,9 @@ class World():
         self.image_counter = 0
         self.markercolor = None
 
-        self.robot_path = '/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo.png'
-        self.infant_path = '/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb.png'
-
+        self.robot_path = '/home/scheidee/belief_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/robot_infant_images/robo.png'
+        self.infant_path = '/home/scheidee/belief_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/robot_infant_images/bb.png'
+        self.zoom = 0.04
 
     def infant_pos_update(self):
         self.infant_pos = self.inf.infant_pos
@@ -122,7 +122,7 @@ class World():
 
         ab = AnnotationBbox(self.getImage(self.robot_path, zoom=self.zoom), [self.robot_pos[0],self.robot_pos[1]], frameon=False)
         ax.add_artist(ab)
-        ab = AnnotationBbox(self.getImage(self.infant_path, zoom=0.04), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
+        ab = AnnotationBbox(self.getImage(self.infant_path, zoom=0.04), [self.infant_pos[0]+0.1,self.infant_pos[1]], frameon=False)
         ax.add_artist(ab)
 
         endy = 0.2 * np.sin(self.infant_pos[2])
@@ -161,6 +161,10 @@ class World():
         #     fig.canvas.draw()
         #     plt.pause(0.1)
         ##plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+        
+        print("#######################")
+        print("ITERATION "+str(iteration))
+        print("#######################")
         plt.savefig("/home/scheidee/Desktop/bbt_updated_plot_images/test_" + str(iteration) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
         # # self.iteration_markerant_sim/src/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
     
