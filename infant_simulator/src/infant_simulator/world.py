@@ -66,16 +66,27 @@ class World():
         self.robot = robot
 
     def change_robot_plot_color(self, robot_action=None):
+        #print('robot_action', robot_action)
+
+        # if not these actions, then goes to default robot picture
         if robot_action == None:
-            self.markercolor = None
+            self.robot_path = '/home/scheidee/belief_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/robot_infant_images/robo.png'
+            self.zoom = 0.04
         elif robot_action == 'bubbles':
-            self.markercolor = 'b'
+            self.robot_path = '/home/scheidee/belief_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/robot_infant_images/robo_bubbles.png'
+            self.zoom = 0.1
         elif robot_action == 'lights':
-            self.markercolor = 'gold'
+            self.robot_path = '/home/scheidee/belief_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/robot_infant_images/robo_lights.png'
+            self.zoom = 0.1
         elif robot_action == 'sounds':
-            self.markercolor = 'black'
-        elif robot_action == 'spin':
-            self.markercolor = 'olive'
+            self.robot_path = '/home/scheidee/belief_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/robot_infant_images/robo_sounds.png'
+            self.zoom = 0.1
+        elif robot_action == 'all':
+            self.robot_path = '/home/scheidee/belief_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/robot_infant_images/robo_all.png'
+            self.zoom = 0.1
+        elif robot_action == 'bubbles_sounds':
+            self.robot_path = '/home/scheidee/belief_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/robot_infant_images/robo_bubbles_sounds.png'
+            self.zoom = 0.1
 
     def gen_world_objects(self, num_objects):
         """
@@ -122,7 +133,7 @@ class World():
 
         ab = AnnotationBbox(self.getImage(self.robot_path, zoom=self.zoom), [self.robot_pos[0],self.robot_pos[1]], frameon=False)
         ax.add_artist(ab)
-        ab = AnnotationBbox(self.getImage(self.infant_path, zoom=0.04), [self.infant_pos[0]+0.1,self.infant_pos[1]], frameon=False)
+        ab = AnnotationBbox(self.getImage(self.infant_path, zoom=0.04), [self.infant_pos[0]+0.5,self.infant_pos[1]], frameon=False)
         ax.add_artist(ab)
 
         endy = 0.2 * np.sin(self.infant_pos[2])
