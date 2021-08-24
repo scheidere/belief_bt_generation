@@ -647,7 +647,7 @@ class Controller:
             #print("Active ids: ", self.robot.bt.active_ids)
 
 
-            infant_action = self.infant.infant_step(self.robot.robot_pos, active_actions, self.world.centers)
+            infant_action = self.infant.infant_step(self.robot.robot_pos, active_actions, self.world.centers, self.world.objects)
             score.infant_sim_reward(infant_action, self.robot.state.infant2robot_dist(self.world))
 
             self.world.infant_pos_update()

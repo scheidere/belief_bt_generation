@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import random
 
 class Parameters:
 
@@ -31,6 +32,25 @@ class Parameters:
     move_reward = 10.0
     fail_reward = -1.0
     n_objects = 3 # Number of toys in the environment
+
+
+    #Interested Child
+    interest_robot_interaction_prob = 308
+    interest_toy_interaction_prob = 175
+    interest_robot_playtime = 35
+    interest_toy_playtime = 19
+
+    #Uninterested Child
+    uninterest_robot_interaction_prob = 68
+    uninterest_toy_interaction_prob = 114
+    uninterest_robot_playtime = 15
+    uninterest_toy_playtime = 12
+
+    #Random
+    random_robot_interaction_prob = 33
+    random_toy_interaction_prob = 33
+    random_robot_playtime = random.randint(1,35)
+    random_toy_playtime = random.randint(1,19)
 
 
     agent_actions = {"move_toward": 0, "move_away": 1, "idle": 2, "spin": 3, "bubbles": 4,"lights": 5, "sounds": 6}

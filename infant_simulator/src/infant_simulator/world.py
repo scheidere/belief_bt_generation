@@ -52,8 +52,8 @@ class World():
         self.markercolor = None
         self.iteration_marker = None
         # default images of robot and baby
-        self.robot_path = '/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo.png'
-        self.infant_path = '/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb.png'
+        self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo.png'
+        self.infant_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb.png'
         self.zoom = 0.04
 
     def infant_pos_update(self):
@@ -75,22 +75,22 @@ class World():
 
         # if not these actions, then goes to default robot picture
         if robot_action == None:
-            self.robot_path = '/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo.png'
+            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo.png'
             self.zoom = 0.04
         elif robot_action == 'bubbles':
-            self.robot_path = '/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_bubbles.png'
+            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_bubbles.png'
             self.zoom = 0.1
         elif robot_action == 'lights':
-            self.robot_path = '/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_lights.png'
+            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_lights.png'
             self.zoom = 0.1
         elif robot_action == 'sounds':
-            self.robot_path = '/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_sounds.png'
+            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_sounds.png'
             self.zoom = 0.1
         elif robot_action == 'all':
-            self.robot_path = '/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_all.png'
+            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_all.png'
             self.zoom = 0.1
         elif robot_action == 'bubbles_sounds':
-            self.robot_path = '/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_bubbles_sounds.png'
+            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_bubbles_sounds.png'
             self.zoom = 0.1
 
     def gen_world_objects(self, num_objects):
@@ -113,8 +113,8 @@ class World():
         Whole plotter function that includes initializing, updating, and saving the plot.
         :return:
         """
-        # plt.ion()
-        # fig = plt.figure(1)
+        plt.ion()
+        fig = plt.figure(1)
         fig , ax = plt.subplots(1)
         ax.set_xlim([0,self.world_x])
         ax.set_ylim([0,self.world_y])
@@ -168,7 +168,7 @@ class World():
         #     fig.canvas.draw()
         #     plt.pause(0.1)
         ##plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
-        plt.savefig("/home/ahelmi/hri_testing/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(iteration) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+        plt.savefig("/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(iteration) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
         # # self.iteration_marker
 
     def bubbles(self):

@@ -3,6 +3,7 @@
 import numpy as np
 from math import sin, cos
 from parameters import Parameters as p
+import random
 
 
 class Infant:
@@ -11,7 +12,7 @@ class Infant:
         self.infant_pos = np.zeros(3)  # x, y, theta
         self.infant_pos_old  = np.zeros(3)
         self.infant_start_pos = np.zeros(3)  # x, y, theta
-        self.inf_table = np.zeros((6,9))
+        self.inf_table = np.zeros((6,9)) #probability table
         self.buffer = p.buff
         #self.inf_close = 0.3048 # 1 ft
         #self.inf_near = 0.9144 # 3 ft
@@ -26,6 +27,34 @@ class Infant:
         self.inf_action = 0
         self.init_inf_probability_table()
         self.set_infant_start_pos(x, y, theta)
+        self.robot_counter = 0
+        self.toy_counter = 0
+        self.still_counter = 0
+        self.move_counter = 0
+        self.state = 0
+        self.robot_interaction_prob = p.uninterest_robot_interaction_prob
+        self.toy_interaction_prob = p.uninterest_toy_interaction_prob
+        self.robot_playtime = p.uninterest_robot_playtime
+        self.toy_playtime = p.uninterest_toy_playtime
+
+    def change_to_interest(self):
+        self.robot_interaction_prob = p.interest_robot_interaction_prob
+        self.toy_interaction_prob = p.interest_toy_interaction_prob
+        self.robot_playtime = p.interest_robot_playtime
+        self.toy_playtime = p.interest_toy_playtime
+    
+    def change_to_uninterested(self):
+        self.robot_interaction_prob = p.uninterest_robot_interaction_prob
+        self.toy_interaction_prob = p.uninterest_toy_interaction_prob
+        self.robot_playtime = p.uninterest_robot_playtime
+        self.toy_playtime = p.uninterest_toy_playtime
+
+    def change_to_random(self):
+        self.robot_interaction_prob = p.random_robot_interaction_prob
+        self.toy_interaction_prob = p.random_toy_interaction_prob
+        self.robot_playtime = p.random_robot_playtime
+        self.toy_playtime = p.random_toy_playtime
+
 
     def set_infant_start_pos(self, x, y, theta):
         """
@@ -70,7 +99,7 @@ class Infant:
         '''
         obj_val = 0
         dist = 0
-        prev_dist = 0
+        prev_dist = 100
 
         for i, obj in enumerate(wld_cent):
             dist = np.sqrt((self.infant_pos[0] - obj[0])**2 + (self.infant_pos[1] - obj[1])**2)
@@ -97,9 +126,124 @@ class Infant:
             self.inf_table[agent_action[0]][agent_action[1]] = 0.1
         else:
             self.inf_table[agent_action[0]][agent_action[1]] -= 0.05        
+    
+    def see_robot(self, robot_pos, wld_obj): 
+        return self.infant_occlusion(robot_pos,wld_obj)
+
+    def see_toy(self, wld_centers):
+        #print("total center", wld_centers)
+        for i, cntr in enumerate(wld_centers):
+               #print("i", i)
+               #print("center", cntr)
+               #print("center x", cntr[0])
+               #print("center y", cntr[1])
+            if self.infant_pos[2] <= np.pi/2:
+                if cntr[0] >= 3 and cntr[1] >=3:
+                    toy_quadrant = 1
+                    #print("toy in quadrant 1")
+                    return True
+            elif self.infant_pos[2] <= np.pi and self.infant_pos[2] >= np.pi/2:
+                if cntr[0] >= 3 and cntr[1] < 3:
+                    toy_quadrant = 2
+                    #print("toy in quadrant 2")
+                    return True
+            elif self.infant_pos[2] <= (3* np.pi)/2 and self.infant_pos[2]  >= np.pi:
+                if cntr[0] < 3 and cntr[1] < 3:
+                    toy_quadrant = 3
+                    #print("toy in quadrant 3")
+                    return True
+            else: 
+                if cntr[0] < 3 and cntr[1] >= 3:
+                    toy_quadrant = 4
+                    #print("toy in quadrant 4")
+                    return True 
+
+#state 0: look away 
+#state 1: keep looking
+#state 2: stay attuned robot
+#state 3: stay attuned toy
+
+    def state_machine(self, wld_centers, robot_pos, wld_obj):
+        self.robot_counter = 0
+        self.toy_counter = 0
+        self.still_counter = 0
+        self.move_counter = 0
+        if not(self.see_robot(robot_pos, wld_obj)) and self.see_toy(wld_centers):
+            interact_prob1 = random.randint(1, 1000)
+            if interact_prob1 <= self.toy_interaction_prob:
+                interact_prob2 = random.randint(1,1000)
+                if interact_prob2 <= 965:
+                    self.state = 3
+                    #print("I am attuned to toy")
+                else:
+                    self.state = 0
+                    #print("I am looking away")
+            elif interact_prob1 >= self.toy_interaction_prob and interact_prob1 <= (self.toy_interaction_prob + self.robot_interaction_prob):
+                interact_prob2 = random.randint(1, 1000)
+                if interact_prob2 <= 965:
+                    self.state = 2
+                    #print("I am attuned to the robot")
+                else:
+                    self.state = 1
+                    #("I am looking away")
+            else:
+                interact_prob2 = random.randint(1, 1000)
+                if interact_prob2 <= 965:
+                    self.state = 0
+                    #print("I am looking away")
+                else:
+                    self.state = 1
+                    #print("I will keep looking")
+
+        elif not(self.see_robot(robot_pos, wld_obj)):
+            interact_prob1 = random.randint(1, 1000)
+            if interact_prob1 <= self.robot_interaction_prob: 
+                interact_prob2 = random.randint(1, 1000)
+                if interact_prob2 <= 965:
+                    self.state = 2
+                    #print("I am attuned to the robot")
+                else:
+                    self.state = 0
+                    #("I am looking away")
+            else:
+                interact_prob2 = random.randint(1, 1000)
+                if interact_prob2 <= 965:
+                    self.state = 0
+                    #print("I am looking away")
+                else:
+                    self.state = 1
+                    #print("I will keep looking")
+
+        elif self.see_toy(wld_centers):
+            interact_prob1 = random.randint(1, 1000)
+            if interact_prob1 <= self.toy_interaction_prob:
+                interact_prob2 = random.randint(1, 1000)
+                if interact_prob2 <= 965:
+                    self.state = 3
+                    #print("I am staying attuned to toy")
+                else:
+                    self.state = 0
+                    #print("I am looking away from toy")
+            else:
+                interact_prob2 = random.randint(1, 1000)
+                if interact_prob2 <= 965:
+                    self.state = 0
+                    #print("I am looking away")
+                else:
+                    self.state = 1
+                    #print("I will keep looking")
+        else:
+            interact_prob1 = random.randint(1, 1000)
+            if interact_prob1 <= 965:
+                self.state = 0
+                #print("I am looking away")
+            else:
+                self.state = 1
+                #print("I will keep looking")
+        return self.state
 
 
-    def infant_occlusion(self, robot_pos, wld_obj, wld_x, wld_y):
+    def infant_occlusion(self, robot_pos, wld_obj):
         """
         Determine if infant is visible to robot or occluded by object. Infant is visible if distance is close but may not be visible
         We assume height is not relevant yet for occlusion
@@ -187,155 +331,157 @@ class Infant:
         
         return collision
 
-    def infant_step(self, robot_pos, active_actions, wld_centers):
-        """
-        infant takes an action
-        1 is infant moves towards the robot
-        2 is infant moves away from the robot
-        3 is infant movement towards an object
-        4 is stationary
-        :return: True if infant moves towards robot, False is infant does anything else
-        """
+    def infant_step(self, robot_pos, active_actions, wld_centers, wld_obj):
         time_step = 1
-        # get random number for checking if action happens
-        check_val = np.random.random()
-        dist_cat = self.infant2robot_dist(robot_pos) 
-        # e.g.: if robot action = bubbles, infant does action with X% probability
-        try:
-            robot_action = p.agent_actions[active_actions[0]]
-        except:
-            robot_action = p.agent_actions['idle'] 
-        action_prob = self.inf_table[dist_cat, robot_action]
-        # print("robot action", robot_action) 
+        self.change_to_interest()
+        #self.change_to_uninterested()
+        #self.change_to_random()
 
-        # IF YOU WANT CHILD TO ALWAYS MOVE TOWARD (for testing): Set check_val to lesser value than action_prob
-        # check_val = 1
-        # action_prob = 2
-
-        if check_val <= action_prob:
-            # success, infant moves towards robot
-            # print("Infant is now moving toward the robot")
-            self.inf_action = 1
-            if (self.infant_pos[0] == robot_pos[0]) or (self.infant_pos[1] == robot_pos[1]):
-                # lie along one of the parallels
-                if self.infant_pos[0] == robot_pos[0]:
-                    # lie along x, check which y is bigger for direction
-                    if self.infant_pos[1] > robot_pos[1]:
-                        theta_new = np.pi/2
-                    else:
-                        theta_new = 3*np.pi/2
-                else:
-                    if self.infant_pos[0] > robot_pos[0]:
-                        theta_new = np.pi
-                    else:
-                        theta_new = 0
-            if (self.infant_pos[0] < robot_pos[0]) and (self.infant_pos[1] < robot_pos[1]):
-                # top right quadrant movement
-                theta_new = np.random.uniform(0, np.pi/2)
-            elif (self.infant_pos[0] > robot_pos[0]) and (self.infant_pos[1] < robot_pos[1]):
-                # top left quadrant movement
-                theta_new = np.random.uniform(np.pi/2, np.pi)
-            elif (self.infant_pos[0] < robot_pos[0]) and (self.infant_pos[1] > robot_pos[1]):
-                # bottom right quadrant movement
-                theta_new = np.random.uniform((3*np.pi)/2, 2*np.pi)
-            else:
-                # bottom left quadrant movement
-                theta_new = np.random.uniform(np.pi, 3*np.pi/2)
-            # move it!
-            x_new = self.infant_pos[0] + self.inf_vel * time_step * cos(theta_new)
-            y_new = self.infant_pos[1] + self.inf_vel * time_step * sin(theta_new)
+        
+        if self.state == 2:
+            print("following robot")
+            self.robot_counter = self.robot_counter + 1
+        #     theta_old = self.infant_pos[2]
+            if self.robot_counter == self.robot_playtime:
+                 self.state_machine(wld_centers, robot_pos, wld_obj)
+                
             self.infant_pos_old = self.infant_pos
-            illegal = self.collision_detection(x_new, y_new, p.x_dim, p.y_dim) # Emily addition to prevent leaving map
-            if not illegal: # Emily addition to prevent leaving map
-                self.infant_pos = [x_new, y_new, theta_new]
-                # infant moved towards the robot so return True
-                return True
-            self.infant_pos = [x_new, y_new, theta_new]
-            return True
+            
+            if round(self.infant_pos[0], 1) == round(robot_pos[0], 1) or round(self.infant_pos[1], 1) == round(robot_pos[1], 1):
+                print("we are in same place")
+            else:
+                delta_x = robot_pos[0] - self.infant_pos[0]
+                delta_y = robot_pos[1] - self.infant_pos[1]
 
-        # elif check_val >= self.inf_grav:   
-        #         # gravity movement towards an object
-        #         self.inf_action = 3
-        #         # find the closest object and let the infant move towards it
-        #         closest_obj = self.inf_obj_dist(wld_centers)
-        #         if (self.infant_pos[0] == wld_centers[closest_obj][0]) or (self.infant_pos[1] == wld_centers[closest_obj][1]):
-        #         # lie along one of the parallels
-        #             if self.infant_pos[0] == wld_centers[closest_obj][0]:
-        #                 # lie along x, check which y is bigger for direction
-        #                 if self.infant_pos[1] > wld_centers[closest_obj][1]:
+                theta_new = np.arctan2(delta_y,delta_x)
+                
+                x_new = self.infant_pos[0] + self.inf_vel * time_step * np.cos(theta_new)
+                y_new = self.infant_pos[1] + self.inf_vel * time_step * np.sin(theta_new)
+                self.infant_pos_old = self.infant_pos
+                self.infant_pos = [x_new, y_new, theta_new]
+                print("infant pos", self.infant_pos)
+                print("robot pos", robot_pos)
+        #     if (self.infant_pos[0] == robot_pos[0]) or (self.infant_pos[1] == robot_pos[1]):
+        #      # lie along one of the parallels
+        #         if self.infant_pos[0] == robot_pos[0]:
+        #             # lie along x, check which y is bigger for direction
+        #             if self.infant_pos[1] > robot_pos[1]:
         #                     theta_new = np.pi/2
-        #                 else:
-        #                     theta_new = 3*np.pi/2
         #             else:
-        #                 if self.infant_pos[0] > wld_centers[closest_obj][0]:
+        #                     theta_new = 3*np.pi/2
+        #         else:
+        #             if self.infant_pos[0] > robot_pos[0]:
         #                     theta_new = np.pi
-        #                 else:
+        #             else:
         #                     theta_new = 0
-        #         if (self.infant_pos[0] < wld_centers[closest_obj][0]) and (self.infant_pos[1] < wld_centers[closest_obj][1]):
+        #     if (self.infant_pos[0] < robot_pos[0]) and (self.infant_pos[1] < robot_pos[1]):
         #             # top right quadrant movement
         #             theta_new = np.random.uniform(0, np.pi/2)
-        #         elif (self.infant_pos[0] > wld_centers[closest_obj][0]) and (self.infant_pos[1] < wld_centers[closest_obj][1]):
+
+        #             print("quadrant 1")
+        #     elif (self.infant_pos[0] > robot_pos[0]) and (self.infant_pos[1] < robot_pos[1]):
         #             # top left quadrant movement
-        #             theta_new = np.random.uniform(np.pi/2,np.pi)
-        #         elif (self.infant_pos[0] < wld_centers[closest_obj][0]) and (self.infant_pos[1] > wld_centers[closest_obj][1]):
+        #             theta_new = np.random.uniform(np.pi/2, np.pi)
+        #             print("quadrant 2")
+        #     elif (self.infant_pos[0] < robot_pos[0]) and (self.infant_pos[1] > robot_pos[1]):
         #             # bottom right quadrant movement
         #             theta_new = np.random.uniform((3*np.pi)/2, 2*np.pi)
-        #         else:
+        #     else:
         #             # bottom left quadrant movement
         #             theta_new = np.random.uniform(np.pi, 3*np.pi/2)
+        #             print("quadrant 3")
         #         # move it!
-        #         x_new = self.infant_pos[0] + self.inf_vel * time_step * cos(theta_new)
-        #         y_new = self.infant_pos[1] + self.inf_vel * time_step * sin(theta_new)
-        #         self.infant_pos_old = self.infant_pos
-        #         illegal = self.collision_detection(x_new, y_new, p.x_dim, p.y_dim) # Emily addition to prevent leaving map
-        #         if not illegal: # Emily addition to prevent leaving map
-        #             self.infant_pos = [x_new, y_new, theta_new]
-        #             return False
+        #     x_new = self.infant_pos[0] + self.inf_vel * time_step * cos(theta_new)
+        #     y_new = self.infant_pos[1] + self.inf_vel * time_step * sin(theta_new)
+        #     self.infant_pos_old = self.infant_pos
+        #     illegal = self.collision_detection(x_new, y_new, p.x_dim, p.y_dim) # Emily addition to prevent leaving map
+        #     if not illegal: # Emily addition to prevent leaving map
         #         self.infant_pos = [x_new, y_new, theta_new]
+        #         # infant moved towards the robot so return True
+        #         return True
+        #     self.infant_pos = [x_new, y_new, theta_new]
+        #     return True
 
-        # failure, child either moves away or stays still
-        elif ((1 - action_prob)/2 + action_prob) > check_val: #  >= action_prob + 0.1:
-            # move away
-            self.inf_action = 2
-            # print("Moving away cuz im a butt")
-            if (self.infant_pos[0] == robot_pos[0]) or (self.infant_pos[1] == robot_pos[1]):
-            # lie along one of the parallels
-                if self.infant_pos[0] == robot_pos[0]:
-                # lie along x, check which y is bigger for direction
-                    if self.infant_pos[1] > robot_pos[1]:
-                        theta_new = 3*np.pi/2
-                    else:
-                        theta_new = np.pi/2
-                else:
-                    if self.infant_pos[0] > robot_pos[0]:
-                        theta_new = np.pi
-                    else:
-                        theta_new = 0
-            if (self.infant_pos[0] < robot_pos[0]) and (self.infant_pos[1] < robot_pos[1]):
-                # bottom left quadrant movement
-                theta_new = np.random.uniform(np.pi, (3*np.pi)/2)
-            elif (self.infant_pos[0] > robot_pos[0]) and (self.infant_pos[1] < robot_pos[1]):
-                # bottom right quadrant movement
-                theta_new = np.random.uniform((3*np.pi)/2, 2* np.pi)
-            elif (self.infant_pos[0] < robot_pos[0]) and (self.infant_pos[1] > robot_pos[1]):
-                # top left quadrant movement
-                theta_new = np.random.uniform(np.pi/2, np.pi)
+        elif self.state == 3:
+            print("following toy")
+            self.toy_counter = self.toy_counter + 1
+            if self.toy_counter == self.toy_playtime:
+                self.state_machine(wld_centers, robot_pos, wld_obj)
+            
+            closest_obj = self.inf_obj_dist(wld_centers)
+            if round(self.infant_pos[0], 1) == round(wld_centers[closest_obj][0], 1) or round(self.infant_pos[1], 1) == round(wld_centers[closest_obj][1], 1):
+                print("we are in same place")
             else:
-                # top right quadrant movement
-                theta_new = np.random.uniform(0, np.pi/2)
-            # move it!
-            x_new = self.infant_pos[0] + self.inf_vel * time_step * cos(theta_new)
-            y_new = self.infant_pos[1] + self.inf_vel * time_step * sin(theta_new)
-            self.infant_pos_old = self.infant_pos
-            illegal = self.collision_detection(x_new, y_new, p.x_dim, p.y_dim) # Emily addition to prevent leaving map
-            if not illegal: # Emily addition to prevent leaving map
+                delta_x = wld_centers[closest_obj][0] - self.infant_pos[0]
+                delta_y = wld_centers[closest_obj][1] - self.infant_pos[1]
+
+                theta_new = np.arctan2(delta_y,delta_x)
+                
+                x_new = self.infant_pos[0] + self.inf_vel * time_step * np.cos(theta_new)
+                y_new = self.infant_pos[1] + self.inf_vel * time_step * np.sin(theta_new)
+                self.infant_pos_old = self.infant_pos
                 self.infant_pos = [x_new, y_new, theta_new]
-                return False
-            self.infant_pos = [x_new, y_new, theta_new]
 
+            # closest_obj = self.inf_obj_dist(wld_centers)
+            # theta_old = self.infant_pos[2]
+            # if (self.infant_pos[0] == wld_centers[closest_obj][0]) or (self.infant_pos[1] == wld_centers[closest_obj][1]):
+            #     # lie along one of the parallels
+            #     if self.infant_pos[0] == wld_centers[closest_obj][0]:
+            #             # lie along x, check which y is bigger for direction
+            #         if self.infant_pos[1] > wld_centers[closest_obj][1]:
+            #                 theta_new = np.pi/2
+            #         else:
+            #                 theta_new = 3*np.pi/2
+            #     else:
+            #         if self.infant_pos[0] > wld_centers[closest_obj][0]:
+            #                 theta_new = np.pi
+            #         else:
+            #                 theta_new = 0
+            # if (self.infant_pos[0] < wld_centers[closest_obj][0]) and (self.infant_pos[1] < wld_centers[closest_obj][1]):
+            #         # top right quadrant movement
+            #         theta_new = np.random.uniform(0, np.pi/2)
+
+            # elif (self.infant_pos[0] > wld_centers[closest_obj][0]) and (self.infant_pos[1] < wld_centers[closest_obj][1]):
+            #         # top left quadrant movement
+            #         theta_new = np.random.uniform(np.pi/2,np.pi)
+            # elif (self.infant_pos[0] < wld_centers[closest_obj][0]) and (self.infant_pos[1] > wld_centers[closest_obj][1]):
+            #         # bottom right quadrant movement
+            #         theta_new = np.random.uniform((3*np.pi)/2, 2*np.pi)    
+            # else:
+            #         # bottom left quadrant movement
+            #         theta_new = np.random.uniform(np.pi, 3*np.pi/2)
+            #     # move it!
+            # x_new = self.infant_pos[0] + self.inf_vel * time_step * cos(theta_new)
+            # y_new = self.infant_pos[1] + self.inf_vel * time_step * sin(theta_new)
+            # self.infant_pos_old = self.infant_pos
+            # illegal = self.collision_detection(x_new, y_new, p.x_dim, p.y_dim) # Emily addition to prevent leaving map
+            # if not illegal: # Emily addition to prevent leaving map
+            #     self.infant_pos = [x_new, y_new, theta_new]
+            #     return False
+            # self.infant_pos = [x_new, y_new, theta_new]
+            
+        elif self.state == 1:
+            self.still_counter = self.still_counter + 1
+            if self.still_counter == 2:
+                self.state_machine(wld_centers, robot_pos, wld_obj)
+            print("staying still")
+        elif self.state == 0:
+            self.move_counter = self.move_counter + 1
+            if self.move_counter == 2:
+                self.state_machine(wld_centers, robot_pos, wld_obj)
+            print("moving random!")
+            what_degree = random.randint(0, 10)
+            new_degree = 10 * np.pi/180
+            old_theta = self.infant_pos[2]
+            if what_degree <=5:
+                new_theta = new_degree + old_theta
+            else:
+                new_theta = new_degree - old_theta
+            new_x = self.infant_pos[0] + self.inf_vel * time_step * cos(new_theta)
+            new_y = self.infant_pos[1] + self.inf_vel * time_step * sin(new_theta)
+            self.infant_pos_old = self.infant_pos
+            self.infant_pos = [new_x, new_y, new_theta]
+            return True
         else:
-            # print("Stationary yo")
-            # stationary
-            self.inf_action = 4
-
-        return False
+            self.state_machine(wld_centers, robot_pos, wld_obj)
+            print("run function")
