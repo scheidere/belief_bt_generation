@@ -339,7 +339,6 @@ class Infant:
 
         
         if self.state == 2:
-            print("following robot")
             self.robot_counter = self.robot_counter + 1
         #     theta_old = self.infant_pos[2]
             if self.robot_counter == self.robot_playtime:
@@ -348,7 +347,7 @@ class Infant:
             self.infant_pos_old = self.infant_pos
             
             if round(self.infant_pos[0], 1) == round(robot_pos[0], 1) or round(self.infant_pos[1], 1) == round(robot_pos[1], 1):
-                print("we are in same place")
+                pass
             else:
                 delta_x = robot_pos[0] - self.infant_pos[0]
                 delta_y = robot_pos[1] - self.infant_pos[1]
@@ -359,8 +358,8 @@ class Infant:
                 y_new = self.infant_pos[1] + self.inf_vel * time_step * np.sin(theta_new)
                 self.infant_pos_old = self.infant_pos
                 self.infant_pos = [x_new, y_new, theta_new]
-                print("infant pos", self.infant_pos)
-                print("robot pos", robot_pos)
+                # print("infant pos", self.infant_pos)
+                # print("robot pos", robot_pos)
         #     if (self.infant_pos[0] == robot_pos[0]) or (self.infant_pos[1] == robot_pos[1]):
         #      # lie along one of the parallels
         #         if self.infant_pos[0] == robot_pos[0]:
@@ -403,14 +402,14 @@ class Infant:
         #     return True
 
         elif self.state == 3:
-            print("following toy")
+            # print("following toy")
             self.toy_counter = self.toy_counter + 1
             if self.toy_counter == self.toy_playtime:
                 self.state_machine(wld_centers, robot_pos, wld_obj)
             
             closest_obj = self.inf_obj_dist(wld_centers)
             if round(self.infant_pos[0], 1) == round(wld_centers[closest_obj][0], 1) or round(self.infant_pos[1], 1) == round(wld_centers[closest_obj][1], 1):
-                print("we are in same place")
+                pass
             else:
                 delta_x = wld_centers[closest_obj][0] - self.infant_pos[0]
                 delta_y = wld_centers[closest_obj][1] - self.infant_pos[1]
@@ -464,12 +463,12 @@ class Infant:
             self.still_counter = self.still_counter + 1
             if self.still_counter == 2:
                 self.state_machine(wld_centers, robot_pos, wld_obj)
-            print("staying still")
+            # print("staying still")
         elif self.state == 0:
             self.move_counter = self.move_counter + 1
             if self.move_counter == 2:
                 self.state_machine(wld_centers, robot_pos, wld_obj)
-            print("moving random!")
+            # print("moving random!")
             what_degree = random.randint(0, 10)
             new_degree = 10 * np.pi/180
             old_theta = self.infant_pos[2]
@@ -484,4 +483,3 @@ class Infant:
             return True
         else:
             self.state_machine(wld_centers, robot_pos, wld_obj)
-            print("run function")

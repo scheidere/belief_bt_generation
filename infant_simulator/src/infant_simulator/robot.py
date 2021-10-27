@@ -608,8 +608,9 @@ class Robot:
             #         self.bt_interface.setActionStatusSuccess(action)
             
             else:
-                print('action',action)
-                print("set_action_status: Action does not exist")
+                pass
+                # print('action',action)
+                # print("set_action_status: Action does not exist")
 
 
 class Controller:
@@ -635,7 +636,7 @@ class Controller:
         # num_iterations += 1
         # r.sleep()
 
-        while not rospy.is_shutdown() and num_iterations < 900:
+        while not rospy.is_shutdown() and num_iterations < 300:
             #for i in range(10): # test loop, need to use above ros method
             #print(' ')
             #print("iteration: " + str(num_iterations))
@@ -643,7 +644,7 @@ class Controller:
 
             # active_actions = self.robot.do_random()
             active_actions = self.robot.do_iteration()
-            print("Active: ", active_actions, " Iterations: ", num_iterations)
+            # print("Active: ", active_actions, " Iterations: ", num_iterations)
             #print("Active ids: ", self.robot.bt.active_ids)
 
 
@@ -655,7 +656,8 @@ class Controller:
             self.world.world_plot(num_iterations)
             # print('Infant action: ', infant_action)
             num_iterations += 1
-            time.sleep(1)
+            print("iterations: ", num_iterations)
+            #time.sleep(1)
             #r.sleep()
             
         return score.score, score.distance  

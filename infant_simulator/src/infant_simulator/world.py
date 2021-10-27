@@ -53,7 +53,12 @@ class World():
         self.iteration_marker = None
         # default images of robot and baby
         self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo.png'
-        self.infant_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb.png'
+        #self.infant_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb2.png'
+        self.toy1 = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/toy1.jpg'
+        self.toy2 = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/toy2.jpeg'
+        self.toy3 = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/toy3.jpg'
+        self.infant_left = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb_walk.png'
+        self.infant_right = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb_walk.png'
         self.zoom = 0.04
 
     def infant_pos_update(self):
@@ -71,7 +76,7 @@ class World():
         self.robot = robot
 
     def change_robot_plot_color(self, robot_action=None):
-        print('robot_action', robot_action)
+       # print('robot_action', robot_action)
 
         # if not these actions, then goes to default robot picture
         if robot_action == None:
@@ -100,8 +105,17 @@ class World():
         """
         for obj in range(num_objects):
             # random x corner, random y corner, random width, random height
-            obj_x = np.random.uniform(0, self.world_x-1)
-            obj_y = np.random.uniform(0, self.world_y-1)
+            if obj == 0:
+                obj_x = 3
+                obj_y = 1
+            elif obj ==1:
+                obj_x = 4
+                obj_y = 4
+            elif obj == 2:
+                obj_x = 1
+                obj_y = 4
+            #obj_x = np.random.uniform(0, self.world_x-1)
+            #obj_y = np.random.uniform(0, self.world_y-1)
             obj_w = np.random.uniform(0.5, 1.21)
             obj_h = np.random.uniform(0.5, 1.21)
             # bottom left corner, bottom right corner, top right corner, top left corner 
@@ -113,7 +127,7 @@ class World():
         Whole plotter function that includes initializing, updating, and saving the plot.
         :return:
         """
-        plt.ion()
+       # plt.ion()
         fig = plt.figure(1)
         fig , ax = plt.subplots(1)
         ax.set_xlim([0,self.world_x])
@@ -121,22 +135,43 @@ class World():
         ax.set_yticks([])
         ax.set_xticks([])
 
-        # for i in range(self.num_objects):
-        #         for k in range(3):
-        #             plt.plot((self.objects[i][k][0],self.objects[i][k+1][0]),(self.objects[i][k][1],self.objects[i][k+1][1]),'r')
-        #         plt.plot((self.objects[i][3][0],self.objects[i][0][0]),(self.objects[i][3][1],self.objects[i][0][1]),'r')
+        #for i in range(self.num_objects):
+        #        for k in range(3):
+         #           plt.plot((self.objects[i][k][0],self.objects[i][k+1][0]),(self.objects[i][k][1],self.objects[i][k+1][1]),'r')
+         #       plt.plot((self.objects[i][3][0],self.objects[i][0][0]),(self.objects[i][3][1],self.objects[i][0][1]),'r')
 
+        ab = AnnotationBbox(self.getImage(self.toy1, zoom=0.05), [self.centers[0][0],self.centers[0][1]], frameon=False)
+        ax.add_artist(ab)
+
+        ab = AnnotationBbox(self.getImage(self.toy2, zoom=0.03), [self.centers[1][0],self.centers[1][1]], frameon=False)
+        ax.add_artist(ab)
+
+        ab = AnnotationBbox(self.getImage(self.toy3, zoom=0.05), [self.centers[2][0],self.centers[2][1]], frameon=False)
+        ax.add_artist(ab)
 
         ab = AnnotationBbox(self.getImage(self.robot_path, zoom=self.zoom), [self.robot_pos[0],self.robot_pos[1]], frameon=False)
         ax.add_artist(ab)
-        ab = AnnotationBbox(self.getImage(self.infant_path, zoom=0.04), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
+
+        delta_x = self.robot_pos[0] - self.infant_pos[0]
+        if delta_x > 0:
+            self.infant_pos[0] -= 0.1
+        elif delta_x < 0:
+            self.infant_pos[0] += 0.1
+        ab = AnnotationBbox(self.getImage(self.infant_right, zoom=0.05), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
         ax.add_artist(ab)
+
+        # if (self.infant_pos[2] > 0 and self.infant_pos[2] <= np.pi/2) or (self.infant_pos[2] >= 3 * np.pi/2):
+        #     ab = AnnotationBbox(self.getImage(self.infant_right, zoom=0.025), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
+        #     ax.add_artist(ab)
+        # else:
+        #     ab = AnnotationBbox(self.getImage(self.infant_left, zoom=0.025), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
+        #     ax.add_artist(ab)
 
         endy = 0.2 * np.sin(self.infant_pos[2])
         endx = 0.2 * np.cos(self.infant_pos[2])
         roby = 0.2 * np.sin(self.robot_pos[2])
         robx = 0.2 * np.cos(self.robot_pos[2])
-        fig.canvas.draw()
+        # fig.canvas.draw()
 
         # plt.show()
         # if self.h_state == None:
@@ -169,6 +204,7 @@ class World():
         #     plt.pause(0.1)
         ##plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
         plt.savefig("/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(iteration) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+        plt.close(plt.gcf())
         # # self.iteration_marker
 
     def bubbles(self):
