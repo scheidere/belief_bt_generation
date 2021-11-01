@@ -333,9 +333,9 @@ class Infant:
 
     def infant_step(self, robot_pos, active_actions, wld_centers, wld_obj):
         time_step = 1
-        #self.change_to_interest()
+        self.change_to_interest()
         #self.change_to_uninterested()
-        self.change_to_random()
+        #self.change_to_random()
 
         
         if self.state == 2:
