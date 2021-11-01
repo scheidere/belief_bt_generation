@@ -28,7 +28,7 @@ class InfantSimulator:
         self.num_objects = p.n_objects
         self.world_x = p.x_dim
         self.world_y = p.y_dim
-        path = '/home/prg/infant_sim/src/belief_bt_generation/behavior_tree/config/inf_manual_tree.tree'
+        path = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/behavior_tree/config/inf_manual_tree.tree'
         self.bt = self.get_behavior_tree(path)
         config = 1
 

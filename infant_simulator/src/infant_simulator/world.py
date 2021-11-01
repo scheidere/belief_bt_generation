@@ -52,13 +52,13 @@ class World():
         self.markercolor = None
         self.iteration_marker = None
         # default images of robot and baby
-        self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo.png'
-        #self.infant_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb2.png'
-        self.toy1 = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/toy1.jpg'
-        self.toy2 = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/toy2.jpeg'
-        self.toy3 = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/toy3.jpg'
-        self.infant_left = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb_walk.png'
-        self.infant_right = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb_walk.png'
+        self.robot_path = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo.png'
+        #self.infant_path = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/bb2.png'
+        self.toy1 = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/toy1.jpg'
+        self.toy2 = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/toy2.jpeg'
+        self.toy3 = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/toy3.jpg'
+        self.infant_left = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/bbleft.png'
+        self.infant_right = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/bbright.png'
         self.zoom = 0.04
 
     def infant_pos_update(self):
@@ -79,23 +79,23 @@ class World():
        # print('robot_action', robot_action)
 
         # if not these actions, then goes to default robot picture
-        if robot_action == None:
-            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo.png'
+        if robot_action == None or robot_action == 'idle':
+            self.robot_path = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo.png'
             self.zoom = 0.04
         elif robot_action == 'bubbles':
-            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_bubbles.png'
+            self.robot_path = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_bubbles.png'
             self.zoom = 0.1
         elif robot_action == 'lights':
-            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_lights.png'
+            self.robot_path = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_lights.png'
             self.zoom = 0.1
         elif robot_action == 'sounds':
-            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_sounds.png'
+            self.robot_path = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_sounds.png'
             self.zoom = 0.1
         elif robot_action == 'all':
-            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_all.png'
+            self.robot_path = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_all.png'
             self.zoom = 0.1
         elif robot_action == 'bubbles_sounds':
-            self.robot_path = '/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_bubbles_sounds.png'
+            self.robot_path = '/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/robo_bubbles_sounds.png'
             self.zoom = 0.1
 
     def gen_world_objects(self, num_objects):
@@ -137,13 +137,17 @@ class World():
 
         #for i in range(self.num_objects):
         #        for k in range(3):
-         #           plt.plot((self.objects[i][k][0],self.objects[i][k+1][0]),(self.objects[i][k][1],self.objects[i][k+1][1]),'r')
-         #       plt.plot((self.objects[i][3][0],self.objects[i][0][0]),(self.objects[i][3][1],self.objects[i][0][1]),'r')
+        #           plt.plot((self.objects[i][k][0],self.objects[i][k+1][0]),(self.objects[i][k][1],self.objects[i][k+1][1]),'r')
+        #       plt.plot((self.objects[i][3][0],self.objects[i][0][0]),(self.objects[i][3][1],self.objects[i][0][1]),'r')
+        # plotting child view point
+        endy = 0.4 * np.sin(self.infant_pos[2])
+        endx = 0.4 * np.cos(self.infant_pos[2])
+        self.infant_plot_arrow = plt.plot([self.infant_pos[0], self.infant_pos[0]+endx], [self.infant_pos[1]+ 0.2, self.infant_pos[1]+0.2+endy])
 
         ab = AnnotationBbox(self.getImage(self.toy1, zoom=0.05), [self.centers[0][0],self.centers[0][1]], frameon=False)
         ax.add_artist(ab)
 
-        ab = AnnotationBbox(self.getImage(self.toy2, zoom=0.03), [self.centers[1][0],self.centers[1][1]], frameon=False)
+        ab = AnnotationBbox(self.getImage(self.toy2, zoom=0.04), [self.centers[1][0],self.centers[1][1]], frameon=False)
         ax.add_artist(ab)
 
         ab = AnnotationBbox(self.getImage(self.toy3, zoom=0.05), [self.centers[2][0],self.centers[2][1]], frameon=False)
@@ -153,24 +157,21 @@ class World():
         ax.add_artist(ab)
 
         delta_x = self.robot_pos[0] - self.infant_pos[0]
-        if delta_x > 0:
-            self.infant_pos[0] -= 0.1
-        elif delta_x < 0:
-            self.infant_pos[0] += 0.1
-        ab = AnnotationBbox(self.getImage(self.infant_right, zoom=0.05), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
-        ax.add_artist(ab)
+        delta_y = self.robot_pos[1] - self.infant_pos[1]
+        if delta_x > 0 and delta_x < 0.3:
+            self.infant_pos[0] -= 0.2
+        elif delta_x < 0 and delta_x > -0.3:
+            self.infant_pos[0] += 0.2
+        # ab = AnnotationBbox(self.getImage(self.infant_right, zoom=0.05), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
+        # ax.add_artist(ab)
 
-        # if (self.infant_pos[2] > 0 and self.infant_pos[2] <= np.pi/2) or (self.infant_pos[2] >= 3 * np.pi/2):
-        #     ab = AnnotationBbox(self.getImage(self.infant_right, zoom=0.025), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
-        #     ax.add_artist(ab)
-        # else:
-        #     ab = AnnotationBbox(self.getImage(self.infant_left, zoom=0.025), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
-        #     ax.add_artist(ab)
+        if (self.infant_pos[2] > 0 and self.infant_pos[2] <= np.pi/2) or (self.infant_pos[2] >= 3 * np.pi/2) or (self.infant_pos[2] < 0 and self.infant_pos[2] > -np.pi/2):
+            ab = AnnotationBbox(self.getImage(self.infant_right, zoom=0.05), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
+            ax.add_artist(ab)
+        else:
+            ab = AnnotationBbox(self.getImage(self.infant_left, zoom=0.075), [self.infant_pos[0],self.infant_pos[1]], frameon=False)
+            ax.add_artist(ab)
 
-        endy = 0.2 * np.sin(self.infant_pos[2])
-        endx = 0.2 * np.cos(self.infant_pos[2])
-        roby = 0.2 * np.sin(self.robot_pos[2])
-        robx = 0.2 * np.cos(self.robot_pos[2])
         # fig.canvas.draw()
 
         # plt.show()
@@ -185,7 +186,6 @@ class World():
             # self.robot_plot = plt.plot(self.robot_pos[0],self.robot_pos[1], marker=".", markersize=10) #, markerfacecolor='b')
             # self.iteration_marker = plt.text(4.5, 5.5, str(iteration), fontsize=10)
             # # get direction of infant and agent
-            # self.infant_plot_arrow = plt.plot([self.infant_pos[0], self.infant_pos[0]+endx], [self.infant_pos[1], self.infant_pos[1]+endy])
             # self.robot_plot_arrow = plt.plot([self.robot_pos[0], robx+self.robot_pos[0]], [self.robot_pos[1], roby+self.robot_pos[1]])
             # fig.canvas.draw()
             # self.h_state = True
@@ -203,7 +203,7 @@ class World():
         #     fig.canvas.draw()
         #     plt.pause(0.1)
         ##plt.savefig("/home/scheidee/belief_behavior_tree_ws/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(self.image_counter) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
-        plt.savefig("/home/prg/infant_sim/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(iteration) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
+        plt.savefig("/home/ahelmi/infant_sim_survey/src/belief_bt_generation/infant_simulator/src/infant_simulator/images/test_" + str(iteration) + ".png")  # , bbox='tight')  # , bbox_extra_artists=[legend])
         plt.close(plt.gcf())
         # # self.iteration_marker
 

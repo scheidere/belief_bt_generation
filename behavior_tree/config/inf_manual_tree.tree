@@ -8,12 +8,12 @@
 				[bubbles]
 			->
 				(child_moving_away)
-				[move_toward]
+				[move_away]
 				[sounds]
 				[bubbles]
 			->
 				(child_stationary)
-				[move_toward]
+				[move_away]
 	->
 		(social_interaction)
 		?
@@ -28,7 +28,7 @@
 				[sounds]
 			->
 				(child_stationary)
-				[idle]
+				[move_away]
 				[lights]
 				[bubbles]
 
